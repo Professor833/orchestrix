@@ -1,265 +1,192 @@
-# AI Workflow Automation Platform
+# Orchestrix: AI-Powered Workflow Automation Platform
 
-A comprehensive AI-powered workflow automation platform built with Django, Next.js, and Celery.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![Django](https://img.shields.io/badge/django-%23092E20.svg?style=for-the-badge&logo=django&logoColor=white)](https://www.djangoproject.com/)
+[![Next JS](https://img.shields.io/badge/Next-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
+[![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io)
 
-## Architecture Overview
+Orchestrix is a comprehensive, open-source platform designed to build, manage, and execute complex workflows with a strong emphasis on AI-driven tasks, real-time monitoring, and seamless integration with external services.
 
-- **Backend**: Django 5.2.4 + Django REST Framework + Celery
-- **Frontend**: Next.js 14+ with TypeScript + Tailwind CSS
-- **Database**: PostgreSQL
-- **Message Broker**: Redis
-- **Authentication**: JWT-based
-- **Deployment**: Docker containers
+## ✨ Features
 
-## Project Structure
+- **Visual Workflow Builder**: A drag-and-drop interface to create complex workflows with various node types (Triggers, Actions, Conditions, Outputs).
+- **Real-time Execution Monitoring**: Live tracking of workflow executions with step-by-step details, logs, and status updates via WebSockets.
+- **Enhanced Dashboard**: A central hub for real-time statistics, quick actions, recent activity feeds, and system-wide analytics.
+- **Workflow Templates Marketplace**: A collection of pre-built, real-world workflow templates (e.g., Email Automation, Social Media Scheduling, Customer Support) that can be deployed with one click.
+- **Advanced Analytics**: Interactive charts and data visualizations for tracking workflow performance, execution trends, and system metrics.
+- **Comprehensive Integration Management**: Support for various integration types (OAuth, Webhooks, APIs) with a secure system for managing credentials.
+- **User Management & RBAC**: Role-Based Access Control to manage user permissions (Admin, Manager, User) and a system for inviting new users.
+- **Interactive API Documentation**: A Swagger/OpenAPI interface for exploring and testing the backend API endpoints.
+- **Real-time Notification System**: A notification center with a bell icon, unread count, and dropdown panel for important system alerts.
+- **Performance Monitoring**: A dedicated view for monitoring system health, including CPU, memory, and database performance.
+- **Mobile-Responsive Design**: Fully responsive UI that works seamlessly across desktops, tablets, and mobile devices.
+- **Dark Mode**: A sleek and modern dark theme to reduce eye strain.
+- **Scalable Architecture**: Built with Celery for asynchronous task processing, ensuring that workflows can scale to handle high volumes.
+
+## 🛠 Tech Stack
+
+| Category          | Technology                                                                                                   |
+| ----------------- | ------------------------------------------------------------------------------------------------------------ |
+| **Backend**       | Django 5.x, Django REST Framework, Celery, Channels                                                          |
+| **Frontend**      | Next.js 14, React 18, TypeScript, Tailwind CSS                                                               |
+| **Database**      | PostgreSQL                                                                                                   |
+| **Message Broker**| Redis                                                                                                        |
+| **Real-time**     | WebSockets (via Django Channels), React Query (for data fetching), EventSource                               |
+| **UI/UX**         | Shadcn/UI, Lucide React (icons), Recharts (charts), Zod (validation), React Hook Form                          |
+| **Authentication**| JWT (JSON Web Tokens) with automatic token refresh                                                           |
+| **Deployment**    | Docker, Docker Compose                                                                                       |
+| **Code Quality**  | ESLint, Prettier, flake8, black, isort, pre-commit hooks                                                       |
+
+## 📂 Project Structure
 
 ```
 orchestrix/
-├── backend/                    # Django backend
-│   ├── orchestrix/            # Django project
-│   ├── apps/                  # Django apps
-│   │   ├── authentication/    # User auth
-│   │   ├── workflows/         # Workflow management
-│   │   ├── executions/        # Execution tracking
-│   └── integrations/      # External integrations
-│   ├── requirements.txt       # Python dependencies
-│   ├── Dockerfile            # Backend Docker config
-│   └── manage.py             # Django management
-├── frontend/                  # Next.js frontend
-│   ├── src/                  # Source code
-│   │   ├── app/              # Next.js app router
-│   │   ├── components/       # React components
-│   │   ├── lib/              # Utilities
-│   └── types/            # TypeScript types
-│   ├── package.json          # Node.js dependencies
-│   └── Dockerfile           # Frontend Docker config
-├── docker-compose.yml        # Multi-container setup
-├── .env.example             # Environment variables template
-├── LINTING.md               # Code quality setup guide
-└── README.md                # This file
+├── backend/                  # Django Backend
+│   ├── apps/                 # Application-specific logic
+│   │   ├── authentication/   # User authentication and JWT handling
+│   │   ├── executions/       # Workflow execution tracking and logs
+│   │   ├── integrations/     # External service integrations (OAuth, Webhooks)
+│   │   └── workflows/        # Workflow creation, management, and templates
+│   ├── orchestrix/           # Django project settings and core configuration
+│   ├── Dockerfile
+│   └── manage.py
+├── frontend/                 # Next.js Frontend
+│   ├── src/
+│   │   ├── app/              # Next.js App Router, pages, and layouts
+│   │   ├── components/       # Reusable React components (UI, dashboard, etc.)
+│   │   ├── lib/              # Core logic, API client, services, auth context
+│   │   └── types/            # TypeScript type definitions
+│   ├── Dockerfile
+│   └── package.json
+├── docker-compose.yml        # Docker configuration for all services
+├── .env.example              # Template for environment variables
+├── LINTING.md                # Guide for code quality and linting setup
+└── README.md                 # This file
 ```
 
-## Quick Start
+## 🚀 Getting Started
 
 ### Prerequisites
+- Docker & Docker Compose
+- Node.js (v18+ for local dev)
+- Python (v3.11+ for local dev)
 
-- Docker and Docker Compose
-- Node.js 18+ (for local development)
-- Python 3.11+ (for local development)
-
-### 1. Clone and Setup
-
+### 1. Clone & Configure
 ```bash
 # Clone the repository
 git clone <repository-url>
 cd orchestrix
 
-# Copy environment variables
+# Create an environment file from the example
 cp .env.example .env
 
-# Edit .env with your configurations
+# Customize your .env file (update secrets, database credentials, etc.)
 nano .env
 ```
 
-### 2. Run with Docker
+### 2. Run with Docker (Recommended)
+This is the simplest way to get the entire platform running.
 
 ```bash
-# Build and start all services
-docker-compose up --build
+# Build and start all services in detached mode
+docker-compose up --build -d
 
-# In another terminal, run migrations
+# View logs for all services
+docker-compose logs -f
+
+# Run database migrations
 docker-compose exec backend python manage.py migrate
 
-# Create superuser (optional)
+# Populate the database with workflow templates
+docker-compose exec backend python manage.py populate_workflow_templates
+
+# Create a superuser (optional)
 docker-compose exec backend python manage.py createsuperuser
 
-# Access the applications
-# Frontend: http://localhost:3000
-# Backend API: http://localhost:8000
-# Admin Panel: http://localhost:8000/admin
+# Stop all services
+docker-compose down
 ```
 
-### 3. Local Development Setup
+### Accessing the Application
+- **Frontend**: [http://localhost:3000](http://localhost:3000)
+- **Backend API**: [http://localhost:8000/api/](http://localhost:8000/api/)
+- **API Docs (Swagger)**: [http://localhost:8000/api/docs/](http://localhost:8000/api/docs/)
+- **Admin Panel**: [http://localhost:8000/admin/](http://localhost:8000/admin/)
 
-#### Backend Setup
+## 📝 API Documentation
+The backend API is documented using OpenAPI (Swagger). Once the backend service is running, you can explore and interact with all the available endpoints by visiting [http://localhost:8000/api/docs/](http://localhost:8000/api/docs/).
 
+## ⚙️ Local Development Setup
+For developers who prefer to run services locally without Docker.
+
+### Backend Setup
 ```bash
 cd backend
 
-# Create virtual environment
+# Create and activate a virtual environment
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
 
-# Set environment variables
-export DATABASE_URL=postgresql://user:password@localhost:5432/orchestrix
-export REDIS_URL=redis://localhost:6379/0
-export SECRET_KEY=your-secret-key
+# Set required environment variables (or use a .env file with python-decouple)
+export DATABASE_URL=...
+export REDIS_URL=...
+export SECRET_KEY=...
 
-# Run migrations
+# Run database migrations
 python manage.py migrate
+python manage.py populate_workflow_templates
 
-# Create superuser
-python manage.py createsuperuser
-
-# Start development server
+# Start the development server
 python manage.py runserver
 ```
 
-#### Frontend Setup
-
+### Frontend Setup
 ```bash
 cd frontend
 
 # Install dependencies
 npm install
 
-# Set environment variables
+# Create a local environment file
 echo "NEXT_PUBLIC_API_URL=http://localhost:8000" > .env.local
 
-# Start development server
+# Start the development server
 npm run dev
 ```
 
-#### Celery Workers
-
+### Celery Workers
+For asynchronous tasks to run, you need to start the Celery worker and scheduler.
 ```bash
-# In backend directory
-cd backend
-
-# Start Celery worker
+# In the backend directory with virtual env activated
+# Start the Celery worker
 celery -A orchestrix worker --loglevel=info
 
-# Start Celery beat (in another terminal)
+# In another terminal, start the Celery beat scheduler
 celery -A orchestrix beat --loglevel=info
 ```
 
-## Code Quality and Linting
+## ✅ Code Quality & Linting
+This project enforces a high standard of code quality using a combination of linters and formatters.
 
-This project uses comprehensive linting and code formatting tools for consistent code quality.
+- **Backend**: `flake8`, `black`, `isort`
+- **Frontend**: `ESLint`, `Prettier`, `TypeScript`
+- **Hooks**: `pre-commit` hooks to automate checks before every commit.
 
-### Backend (Python/Django)
-- **flake8**: Python linting
-- **black**: Code formatting
-- **isort**: Import sorting
+For detailed setup instructions, please see [LINTING.md](./LINTING.md).
 
+### Common Commands
 ```bash
-cd backend
+# Backend: Run all checks and formatting
+cd backend && make check
 
-# Check code quality
-make lint
-
-# Fix formatting issues
-make fix
-
-# Run all checks
-make check
+# Frontend: Run all checks and formatting
+cd frontend && npm run check-all
 ```
 
-### Frontend (TypeScript/Next.js)
-- **ESLint**: TypeScript/JavaScript linting
-- **Prettier**: Code formatting
-- **TypeScript**: Type checking
-
-```bash
-cd frontend
-
-# Check all linting
-npm run check-all
-
-# Fix all issues
-npm run fix-all
-```
-
-### Pre-commit Hooks
-```bash
-# Install pre-commit hooks (optional)
-pip install pre-commit
-pre-commit install
-```
-
-For detailed linting setup and configuration, see [LINTING.md](LINTING.md).
-
-## API Documentation
-
-Once the backend is running, visit:
-- API Documentation: http://localhost:8000/api/docs/
-- Admin Panel: http://localhost:8000/admin/
-
-## Environment Variables
-
-See `.env.example` for all required environment variables.
-
-## Development Commands
-
-### Backend
-
-```bash
-# Run tests
-python manage.py test
-
-# Create new migration
-python manage.py makemigrations
-
-# Apply migrations
-python manage.py migrate
-
-# Collect static files
-python manage.py collectstatic
-
-# Shell access
-python manage.py shell
-```
-
-### Frontend
-
-```bash
-# Run development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Start production server
-npm start
-
-# Run linting
-npm run lint
-
-# Run type checking
-npm run type-check
-```
-
-## Deployment
-
-### Production Docker
-
-```bash
-# Build production images
-docker-compose -f docker-compose.prod.yml build
-
-# Start production services
-docker-compose -f docker-compose.prod.yml up -d
-```
-
-### Manual Deployment
-
-1. Set production environment variables
-2. Build frontend: `npm run build`
-3. Collect static files: `python manage.py collectstatic`
-4. Run migrations: `python manage.py migrate`
-5. Start services with process manager (PM2, Supervisor, etc.)
-
-## Contributing
-
-1. Fork the repository
-2. Create feature branch: `git checkout -b feature/new-feature`
-3. Commit changes: `git commit -am 'Add new feature'`
-4. Push to branch: `git push origin feature/new-feature`
-5. Create Pull Request
-
-## License
-
-This project is licensed under the MIT License.
+## 📄 License
+This project is licensed under the MIT License. See the [LICENSE](https://opensource.org/licenses/MIT) file for details.
