@@ -1,0 +1,408 @@
+<svg width="1200" height="800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="primaryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1E40AF;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="secondaryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10B981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#047857;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F59E0B;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#D97706;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="#F8FAFC"/>
+  
+  <!-- Title -->
+  <text x="600" y="40" font-family="Arial, sans-serif" font-size="28" font-weight="bold" text-anchor="middle" fill="#1E293B">
+    Orchestrix - AI Workflow Automation Platform
+  </text>
+  <text x="600" y="65" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#64748B">
+    System Architecture Overview
+  </text>
+  
+  <!-- Frontend Layer -->
+  <g>
+    <rect x="50" y="100" width="300" height="150" rx="10" fill="url(#primaryGrad)" opacity="0.9"/>
+    <text x="200" y="130" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="white">
+      Frontend Layer
+    </text>
+    
+    <!-- Next.js App -->
+    <rect x="70" y="150" width="120" height="80" rx="5" fill="white" opacity="0.9"/>
+    <text x="130" y="175" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="#1E293B">
+      Next.js 14+
+    </text>
+    <text x="130" y="190" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#64748B">
+      React UI
+    </text>
+    <text x="130" y="205" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#64748B">
+      TypeScript
+    </text>
+    <text x="130" y="220" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#64748B">
+      Tailwind CSS
+    </text>
+    
+    <!-- Web Browser -->
+    <rect x="210" y="150" width="120" height="80" rx="5" fill="white" opacity="0.9"/>
+    <text x="270" y="175" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="#1E293B">
+      Web Browser
+    </text>
+    <text x="270" y="190" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#64748B">
+      Modern Browsers
+    </text>
+    <text x="270" y="205" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#64748B">
+      Responsive UI
+    </text>
+    <text x="270" y="220" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#64748B">
+      PWA Support
+    </text>
+  </g>
+  
+  <!-- API Gateway -->
+  <g>
+    <rect x="450" y="100" width="300" height="150" rx="10" fill="url(#secondaryGrad)" opacity="0.9"/>
+    <text x="600" y="130" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="white">
+      API Gateway
+    </text>
+    
+    <!-- Django REST API -->
+    <rect x="470" y="150" width="120" height="80" rx="5" fill="white" opacity="0.9"/>
+    <text x="530" y="175" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="#1E293B">
+      Django 5.2.4
+    </text>
+    <text x="530" y="190" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#64748B">
+      REST Framework
+    </text>
+    <text x="530" y="205" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#64748B">
+      JWT Auth
+    </text>
+    <text x="530" y="220" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#64748B">
+      API Versioning
+    </text>
+    
+    <!-- WebSocket -->
+    <rect x="610" y="150" width="120" height="80" rx="5" fill="white" opacity="0.9"/>
+    <text x="670" y="175" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="#1E293B">
+      WebSocket
+    </text>
+    <text x="670" y="190" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#64748B">
+      Real-time Updates
+    </text>
+    <text x="670" y="205" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#64748B">
+      Live Monitoring
+    </text>
+    <text x="670" y="220" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#64748B">
+      Notifications
+    </text>
+  </g>
+  
+  <!-- External Services -->
+  <g>
+    <rect x="850" y="100" width="300" height="150" rx="10" fill="url(#accentGrad)" opacity="0.9"/>
+    <text x="1000" y="130" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="white">
+      External Services
+    </text>
+    
+    <!-- AI Services -->
+    <rect x="870" y="150" width="120" height="80" rx="5" fill="white" opacity="0.9"/>
+    <text x="930" y="175" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="#1E293B">
+      AI Services
+    </text>
+    <text x="930" y="190" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#64748B">
+      OpenAI API
+    </text>
+    <text x="930" y="205" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#64748B">
+      Claude API
+    </text>
+    <text x="930" y="220" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#64748B">
+      ML Models
+    </text>
+    
+    <!-- Integrations -->
+    <rect x="1010" y="150" width="120" height="80" rx="5" fill="white" opacity="0.9"/>
+    <text x="1070" y="175" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="#1E293B">
+      Integrations
+    </text>
+    <text x="1070" y="190" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#64748B">
+      Webhooks
+    </text>
+    <text x="1070" y="205" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#64748B">
+      Third-party APIs
+    </text>
+    <text x="1070" y="220" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#64748B">
+      Cloud Services
+    </text>
+  </g>
+  
+  <!-- Core Application Layer -->
+  <g>
+    <rect x="50" y="300" width="500" height="200" rx="10" fill="#E2E8F0" stroke="#94A3B8" stroke-width="2"/>
+    <text x="300" y="330" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#1E293B">
+      Core Application Layer
+    </text>
+    
+    <!-- Django Apps -->
+    <rect x="70" y="350" width="110" height="130" rx="5" fill="url(#primaryGrad)" opacity="0.8"/>
+    <text x="125" y="375" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">
+      Django Apps
+    </text>
+    <text x="125" y="395" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Authentication
+    </text>
+    <text x="125" y="410" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Workflows
+    </text>
+    <text x="125" y="425" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Executions
+    </text>
+    <text x="125" y="440" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Integrations
+    </text>
+    <text x="125" y="455" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Monitoring
+    </text>
+    
+    <!-- Business Logic -->
+    <rect x="200" y="350" width="110" height="130" rx="5" fill="url(#secondaryGrad)" opacity="0.8"/>
+    <text x="255" y="375" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">
+      Business Logic
+    </text>
+    <text x="255" y="395" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Workflow Engine
+    </text>
+    <text x="255" y="410" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Node Processing
+    </text>
+    <text x="255" y="425" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      AI Integration
+    </text>
+    <text x="255" y="440" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Data Pipeline
+    </text>
+    <text x="255" y="455" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Error Handling
+    </text>
+    
+    <!-- Security -->
+    <rect x="330" y="350" width="110" height="130" rx="5" fill="url(#accentGrad)" opacity="0.8"/>
+    <text x="385" y="375" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">
+      Security
+    </text>
+    <text x="385" y="395" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      JWT Authentication
+    </text>
+    <text x="385" y="410" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      RBAC
+    </text>
+    <text x="385" y="425" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      API Rate Limiting
+    </text>
+    <text x="385" y="440" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Data Encryption
+    </text>
+    <text x="385" y="455" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Audit Logging
+    </text>
+    
+    <!-- Validation -->
+    <rect x="460" y="350" width="70" height="130" rx="5" fill="#6B7280" opacity="0.8"/>
+    <text x="495" y="375" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">
+      Validation
+    </text>
+    <text x="495" y="395" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Input Validation
+    </text>
+    <text x="495" y="410" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Schema Check
+    </text>
+    <text x="495" y="425" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Type Safety
+    </text>
+    <text x="495" y="440" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Sanitization
+    </text>
+  </g>
+  
+  <!-- Task Processing Layer -->
+  <g>
+    <rect x="600" y="300" width="550" height="200" rx="10" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2"/>
+    <text x="875" y="330" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#92400E">
+      Task Processing Layer
+    </text>
+    
+    <!-- Celery Workers -->
+    <rect x="620" y="350" width="120" height="130" rx="5" fill="url(#accentGrad)" opacity="0.8"/>
+    <text x="680" y="375" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">
+      Celery Workers
+    </text>
+    <text x="680" y="395" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Async Processing
+    </text>
+    <text x="680" y="410" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Parallel Execution
+    </text>
+    <text x="680" y="425" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Auto Scaling
+    </text>
+    <text x="680" y="440" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Error Recovery
+    </text>
+    <text x="680" y="455" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Progress Tracking
+    </text>
+    
+    <!-- Celery Beat -->
+    <rect x="760" y="350" width="120" height="130" rx="5" fill="url(#secondaryGrad)" opacity="0.8"/>
+    <text x="820" y="375" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">
+      Celery Beat
+    </text>
+    <text x="820" y="395" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Cron Scheduling
+    </text>
+    <text x="820" y="410" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Periodic Tasks
+    </text>
+    <text x="820" y="425" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Interval Triggers
+    </text>
+    <text x="820" y="440" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Dynamic Scheduling
+    </text>
+    <text x="820" y="455" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Time Zone Support
+    </text>
+    
+    <!-- Task Queue -->
+    <rect x="900" y="350" width="120" height="130" rx="5" fill="url(#primaryGrad)" opacity="0.8"/>
+    <text x="960" y="375" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">
+      Task Queue
+    </text>
+    <text x="960" y="395" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Redis Backend
+    </text>
+    <text x="960" y="410" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Message Broker
+    </text>
+    <text x="960" y="425" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Priority Queues
+    </text>
+    <text x="960" y="440" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Result Storage
+    </text>
+    <text x="960" y="455" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Dead Letter Queue
+    </text>
+    
+    <!-- Monitoring -->
+    <rect x="1040" y="350" width="90" height="130" rx="5" fill="#6B7280" opacity="0.8"/>
+    <text x="1085" y="375" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">
+      Monitoring
+    </text>
+    <text x="1085" y="395" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Flower UI
+    </text>
+    <text x="1085" y="410" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Task Stats
+    </text>
+    <text x="1085" y="425" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Worker Health
+    </text>
+    <text x="1085" y="440" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Performance
+    </text>
+    <text x="1085" y="455" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Alerts
+    </text>
+  </g>
+  
+  <!-- Data Layer -->
+  <g>
+    <rect x="50" y="550" width="1100" height="150" rx="10" fill="#DBEAFE" stroke="#3B82F6" stroke-width="2"/>
+    <text x="600" y="580" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#1E40AF">
+      Data Layer
+    </text>
+    
+    <!-- PostgreSQL -->
+    <rect x="100" y="600" width="200" height="80" rx="5" fill="url(#primaryGrad)" opacity="0.8"/>
+    <text x="200" y="625" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="white">
+      PostgreSQL Database
+    </text>
+    <text x="200" y="645" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Primary Data Store • ACID Compliance</text>
+    <text x="200" y="660" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Workflows • Users • Executions • Logs</text>
+    
+    <!-- Redis -->
+    <rect x="350" y="600" width="150" height="80" rx="5" fill="url(#secondaryGrad)" opacity="0.8"/>
+    <text x="425" y="625" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="white">
+      Redis Cache
+    </text>
+    <text x="425" y="645" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Session Store • Message Broker</text>
+    <text x="425" y="660" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Task Queue • Caching</text>
+    
+    <!-- File Storage -->
+    <rect x="550" y="600" width="150" height="80" rx="5" fill="url(#accentGrad)" opacity="0.8"/>
+    <text x="625" y="625" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="white">
+      File Storage
+    </text>
+    <text x="625" y="645" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Static Files • Media</text>
+    <text x="625" y="660" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Logs • Exports</text>
+    
+    <!-- Backup -->
+    <rect x="750" y="600" width="150" height="80" rx="5" fill="#6B7280" opacity="0.8"/>
+    <text x="825" y="625" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="white">
+      Backup System
+    </text>
+    <text x="825" y="645" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Automated Backups</text>
+    <text x="825" y="660" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Point-in-time Recovery</text>
+    
+    <!-- Analytics -->
+    <rect x="950" y="600" width="150" height="80" rx="5" fill="#8B5CF6" opacity="0.8"/>
+    <text x="1025" y="625" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="white">
+      Analytics
+    </text>
+    <text x="1025" y="645" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Usage Metrics</text>
+    <text x="1025" y="660" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">
+      Performance Data</text>
+  </g>
+  
+  <!-- Connection Lines -->
+  <line x1="200" y1="250" x2="600" y2="300" stroke="#64748B" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="600" y1="250" x2="600" y2="300" stroke="#64748B" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="1000" y1="250" x2="875" y2="300" stroke="#64748B" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="300" y1="500" x2="300" y2="550" stroke="#64748B" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="875" y1="500" x2="600" y2="550" stroke="#64748B" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- Arrow marker -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#64748B"/>
+    </marker>
+  </defs>
+  
+  <!-- Legend -->
+  <g>
+    <rect x="50" y="730" width="500" height="60" rx="5" fill="white" stroke="#E2E8F0" stroke-width="1"/>
+    <text x="70" y="750" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#1E293B">
+      Technology Stack:
+    </text>
+    <text x="70" y="770" font-family="Arial, sans-serif" font-size="10" fill="#64748B">
+      • Frontend: Next.js 14+ • TypeScript • Tailwind CSS • React
+    </text>
+    <text x="70" y="785" font-family="Arial, sans-serif" font-size="10" fill="#64748B">
+      • Backend: Django 5.2.4 • DRF • Celery • Celery Beat • Redis • PostgreSQL
+    </text>
+  </g>
+</svg>
