@@ -62,6 +62,13 @@ export interface Workflow {
   node_count: number
   created_at: string
   updated_at: string
+  is_paused: boolean
+  nodes: WorkflowNode[]
+  edges: any[]
+  last_run_at?: string
+  owner: number
+  category?: string
+  tags?: string[]
 }
 
 export interface WorkflowNode {
@@ -87,6 +94,7 @@ export interface WorkflowNode {
     | 'database'
     | 'custom'
   name: string
+  description: string
   configuration: Record<string, any>
   input_schema: Record<string, any>
   output_schema: Record<string, any>
@@ -176,19 +184,11 @@ export interface WorkflowTemplate {
   id: string
   name: string
   description: string
-  category:
-    | 'ai'
-    | 'data'
-    | 'automation'
-    | 'integration'
-    | 'notification'
-    | 'utility'
-    | 'custom'
-  workflow_config: Record<string, any>
-  node_configs: WorkflowNode[]
-  is_public: boolean
+  category: string
   usage_count: number
-  created_at: string
+  updated_at: string
+  nodes: WorkflowNode[]
+  node_configs: any[]
 }
 
 // UI State Types

@@ -2,32 +2,32 @@
 Views for integration management.
 """
 
-from rest_framework import viewsets, status
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters
 from django.utils import timezone
+
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 from .models import (
     Integration,
     IntegrationCategory,
-    IntegrationTemplate,
     IntegrationLog,
+    IntegrationTemplate,
     WebhookEndpoint,
     WebhookEvent,
 )
 from .serializers import (
-    IntegrationSerializer,
-    IntegrationListSerializer,
     IntegrationCategorySerializer,
-    IntegrationTemplateSerializer,
+    IntegrationListSerializer,
     IntegrationLogSerializer,
+    IntegrationSerializer,
+    IntegrationSyncSerializer,
+    IntegrationTemplateSerializer,
+    IntegrationTestSerializer,
     WebhookEndpointSerializer,
     WebhookEventSerializer,
-    IntegrationTestSerializer,
-    IntegrationSyncSerializer,
 )
 
 
@@ -53,7 +53,7 @@ class IntegrationTemplateViewSet(viewsets.ReadOnlyModelViewSet):
         filters.SearchFilter,
         filters.OrderingFilter,
     ]
-    filterset_fields = ["category", "service_name", "auth_type", "is_active"]
+    filterset_fields = ["category", "service_name", "service_type", "is_active"]
     search_fields = ["name", "service_name", "description"]
     ordering_fields = ["name", "service_name", "created_at"]
     ordering = ["name"]
@@ -81,8 +81,8 @@ class IntegrationViewSet(viewsets.ModelViewSet):
         "is_active",
         "is_verified",
     ]
-    search_fields = ["name", "service_name", "description"]
-    ordering_fields = ["name", "service_name", "created_at", "last_sync"]
+    search_fields = ["display_name", "service_name", "description"]
+    ordering_fields = ["display_name", "service_name", "created_at", "last_used"]
     ordering = ["-created_at"]
 
     def get_queryset(self):
@@ -114,10 +114,11 @@ class IntegrationViewSet(viewsets.ModelViewSet):
             # Log the test
             IntegrationLog.objects.create(
                 integration=integration,
-                action="test_connection",
-                status="success",
-                request_data={},
-                response_data=serializer.validated_data,
+                user=request.user,
+                level="info",
+                action="verified",
+                message="Integration connection test successful",
+                data=serializer.validated_data,
             )
 
             return Response(serializer.validated_data)
@@ -134,17 +135,18 @@ class IntegrationViewSet(viewsets.ModelViewSet):
         )
 
         if serializer.is_valid():
-            # Update last sync time
-            integration.last_sync = timezone.now()
-            integration.save(update_fields=["last_sync"])
+            # Update last used time
+            integration.last_used = timezone.now()
+            integration.save(update_fields=["last_used"])
 
             # Log the sync
             IntegrationLog.objects.create(
                 integration=integration,
+                user=request.user,
+                level="info",
                 action="sync",
-                status="success",
-                request_data=request.data,
-                response_data=serializer.validated_data,
+                message="Integration sync started",
+                data=serializer.validated_data,
             )
 
             return Response(serializer.validated_data)
@@ -195,7 +197,7 @@ class IntegrationLogViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = IntegrationLogSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
-    filterset_fields = ["integration", "action", "status"]
+    filterset_fields = ["integration", "action", "level"]
     ordering_fields = ["created_at"]
     ordering = ["-created_at"]
 
@@ -246,8 +248,8 @@ class WebhookEndpointViewSet(viewsets.ModelViewSet):
 
         # Generate new secret key
         new_secret = hashlib.sha256(str(uuid.uuid4()).encode()).hexdigest()
-        webhook.secret_key = new_secret
-        webhook.save(update_fields=["secret_key"])
+        webhook.secret = new_secret
+        webhook.save(update_fields=["secret"])
 
         serializer = self.get_serializer(webhook)
         return Response(serializer.data)
@@ -275,7 +277,7 @@ class WebhookEventViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = WebhookEventSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
-    filterset_fields = ["endpoint", "event_type", "processed"]
+    filterset_fields = ["endpoint", "status"]
     ordering_fields = ["created_at", "processed_at"]
     ordering = ["-created_at"]
 

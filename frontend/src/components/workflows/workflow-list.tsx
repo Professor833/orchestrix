@@ -4,14 +4,16 @@ import { Button } from '@/components/ui/button'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import { workflowService } from '@/lib/services/workflows'
 import { Workflow } from '@/types'
-import { useQuery } from '@tanstack/react-query'
-import { formatDistanceToNow } from 'date-fns'
-import { Copy, Edit, Pause, Play, Plus, Trash2 } from 'lucide-react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
+import { toast } from 'sonner'
+import { WorkflowCard } from './workflow-card'
 
 export function WorkflowList() {
   const [currentPage, setCurrentPage] = useState(1)
+  const queryClient = useQueryClient()
 
   const {
     data: workflowsData,
@@ -22,53 +24,72 @@ export function WorkflowList() {
     queryFn: () =>
       workflowService.getWorkflows({
         page: currentPage,
-        page_size: 10,
+        page_size: 12,
       }),
+    staleTime: 0, // Always refetch to get fresh data
+    gcTime: 0, // Don't cache the data (renamed from cacheTime in newer versions)
   })
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active':
-        return 'bg-green-100 text-green-800'
-      case 'draft':
-        return 'bg-gray-100 text-gray-800'
-      case 'paused':
-        return 'bg-yellow-100 text-yellow-800'
-      case 'archived':
-        return 'bg-red-100 text-red-800'
-      default:
-        return 'bg-gray-100 text-gray-800'
-    }
+  const executeWorkflowMutation = useMutation({
+    mutationFn: (workflowId: string) =>
+      workflowService.executeWorkflow(workflowId),
+    onSuccess: () => {
+      toast.success('Workflow execution started!')
+      queryClient.invalidateQueries({ queryKey: ['workflows'] })
+    },
+    onError: (error: any) => {
+      toast.error('Failed to execute workflow', {
+        description: error.response?.data?.detail || error.message,
+      })
+    },
+  })
+
+  const toggleStatusMutation = useMutation({
+    mutationFn: ({
+      workflowId,
+      isActive,
+    }: {
+      workflowId: string
+      isActive: boolean
+    }) => workflowService.toggleWorkflowStatus(workflowId, isActive),
+    onSuccess: (_, { isActive }) => {
+      toast.success(`Workflow ${isActive ? 'activated' : 'paused'}!`)
+      queryClient.invalidateQueries({ queryKey: ['workflows'] })
+    },
+    onError: (error: any) => {
+      toast.error('Failed to update workflow status', {
+        description: error.response?.data?.detail || error.message,
+      })
+    },
+  })
+
+  const cloneWorkflowMutation = useMutation({
+    mutationFn: (workflowId: string) =>
+      workflowService.cloneWorkflow(workflowId),
+    onSuccess: () => {
+      toast.success('Workflow cloned successfully!')
+      queryClient.invalidateQueries({ queryKey: ['workflows'] })
+    },
+    onError: (error: any) => {
+      toast.error('Failed to clone workflow', {
+        description: error.response?.data?.detail || error.message,
+      })
+    },
+  })
+
+  const handleExecuteWorkflow = (workflowId: string) => {
+    executeWorkflowMutation.mutate(workflowId)
   }
 
-  const handleExecuteWorkflow = async (workflowId: string) => {
-    try {
-      await workflowService.executeWorkflow(workflowId)
-      // Show success message
-    } catch (error) {
-      console.error('Failed to execute workflow:', error)
-    }
+  const handleToggleStatus = (workflow: Workflow) => {
+    toggleStatusMutation.mutate({
+      workflowId: workflow.id,
+      isActive: !workflow.is_active,
+    })
   }
 
-  const handleToggleStatus = async (workflow: Workflow) => {
-    try {
-      await workflowService.toggleWorkflowStatus(
-        workflow.id,
-        !workflow.is_active
-      )
-      // Refresh data
-    } catch (error) {
-      console.error('Failed to toggle workflow status:', error)
-    }
-  }
-
-  const handleCloneWorkflow = async (workflowId: string) => {
-    try {
-      await workflowService.cloneWorkflow(workflowId)
-      // Refresh data
-    } catch (error) {
-      console.error('Failed to clone workflow:', error)
-    }
+  const handleCloneWorkflow = (workflowId: string) => {
+    cloneWorkflowMutation.mutate(workflowId)
   }
 
   if (isLoading) {
@@ -118,107 +139,21 @@ export function WorkflowList() {
 
   return (
     <>
-      <div className="overflow-hidden bg-white shadow sm:rounded-md">
-        <ul className="divide-y divide-gray-200">
-          {workflowsData.results.map(workflow => (
-            <li key={workflow.id}>
-              <div className="flex items-center justify-between px-4 py-4">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100">
-                      <svg
-                        className="h-6 w-6 text-blue-600"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M13 10V3L4 14h7v7l9-11h-7z"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="ml-4">
-                    <div className="flex items-center">
-                      <p className="text-sm font-medium text-gray-900">
-                        {workflow.name}
-                      </p>
-                      <span
-                        className={`ml-2 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusColor(workflow.status)}`}
-                      >
-                        {workflow.status}
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-500">
-                      {workflow.description}
-                    </p>
-                    <div className="mt-1 flex items-center text-xs text-gray-400">
-                      <span>{workflow.node_count} nodes</span>
-                      <span className="mx-2">•</span>
-                      <span>v{workflow.version}</span>
-                      <span className="mx-2">•</span>
-                      <span>
-                        Updated{' '}
-                        {formatDistanceToNow(new Date(workflow.updated_at))} ago
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleExecuteWorkflow(workflow.id)}
-                    title="Execute workflow"
-                  >
-                    <Play className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleToggleStatus(workflow)}
-                    title={
-                      workflow.is_active
-                        ? 'Pause workflow'
-                        : 'Activate workflow'
-                    }
-                  >
-                    {workflow.is_active ? (
-                      <Pause className="h-4 w-4" />
-                    ) : (
-                      <Play className="h-4 w-4" />
-                    )}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleCloneWorkflow(workflow.id)}
-                    title="Clone workflow"
-                  >
-                    <Copy className="h-4 w-4" />
-                  </Button>
-                  <Link href={`/workflows/${workflow.id}/edit`}>
-                    <Button variant="ghost" size="icon" title="Edit workflow">
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                  </Link>
-                  <Button variant="ghost" size="icon" title="Delete workflow">
-                    <Trash2 className="h-4 w-4 text-red-600" />
-                  </Button>
-                </div>
-              </div>
-            </li>
-          ))}
-        </ul>
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {workflowsData.results.map(workflow => (
+          <WorkflowCard
+            key={workflow.id}
+            workflow={workflow}
+            onExecute={handleExecuteWorkflow}
+            onToggleStatus={handleToggleStatus}
+            onClone={handleCloneWorkflow}
+          />
+        ))}
       </div>
 
       {/* Pagination */}
-      {workflowsData && workflowsData.count > 10 && (
-        <div className="flex items-center justify-between">
+      {workflowsData && workflowsData.count > 12 && (
+        <div className="mt-8 flex items-center justify-between">
           <div className="flex flex-1 justify-between sm:hidden">
             <Button
               variant="outline"
@@ -240,7 +175,7 @@ export function WorkflowList() {
               <p className="text-sm text-gray-700">
                 Showing <span className="font-medium">1</span> to{' '}
                 <span className="font-medium">
-                  {Math.min(10, workflowsData.count)}
+                  {Math.min(12, workflowsData.count)}
                 </span>{' '}
                 of <span className="font-medium">{workflowsData.count}</span>{' '}
                 results

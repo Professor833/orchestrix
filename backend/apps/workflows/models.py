@@ -3,13 +3,10 @@ Workflow models for workflow management and orchestration.
 """
 
 import uuid
-from django.db import models
-from django.contrib.auth import get_user_model
-from django.utils.translation import gettext_lazy as _
 
-# JSONSchemaValidator is not available in Django 4.2, removed for compatibility
-# JSONField is now built into Django models, no need for postgres-specific import
-import json
+from django.contrib.auth import get_user_model
+from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 User = get_user_model()
 
@@ -83,6 +80,9 @@ class Workflow(models.Model):
     )
     trigger_config = models.JSONField(_("trigger configuration"), default=dict)
     version = models.PositiveIntegerField(_("version"), default=1)
+    category = models.CharField(_("category"), max_length=50, blank=True, null=True)
+    tags = models.JSONField(_("tags"), default=list)
+    last_run_at = models.DateTimeField(_("last run at"), null=True, blank=True)
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("updated at"), auto_now=True)
 

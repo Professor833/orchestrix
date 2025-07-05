@@ -2,13 +2,15 @@
 Serializers for integration models.
 """
 
-from rest_framework import serializers
 from django.contrib.auth import get_user_model
+
+from rest_framework import serializers
+
 from .models import (
     Integration,
     IntegrationCategory,
-    IntegrationTemplate,
     IntegrationLog,
+    IntegrationTemplate,
     WebhookEndpoint,
     WebhookEvent,
 )
@@ -21,8 +23,8 @@ class IntegrationCategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = IntegrationCategory
-        fields = ["id", "name", "description", "icon", "created_at", "updated_at"]
-        read_only_fields = ["id", "created_at", "updated_at"]
+        fields = ["id", "name", "description", "icon", "color", "created_at"]
+        read_only_fields = ["id", "created_at"]
 
 
 class IntegrationTemplateSerializer(serializers.ModelSerializer):
@@ -35,9 +37,13 @@ class IntegrationTemplateSerializer(serializers.ModelSerializer):
             "category",
             "name",
             "service_name",
+            "service_type",
             "description",
-            "config_schema",
-            "auth_type",
+            "configuration_schema",
+            "credential_schema",
+            "setup_instructions",
+            "icon",
+            "documentation_url",
             "is_active",
             "created_at",
             "updated_at",
@@ -61,23 +67,28 @@ class IntegrationSerializer(serializers.ModelSerializer):
             "category_name",
             "service_name",
             "service_type",
-            "name",
+            "display_name",
             "description",
             "configuration",
+            "credentials",
             "is_active",
             "is_verified",
-            "last_sync",
+            "last_used",
+            "usage_count",
             "created_at",
             "updated_at",
+            "expires_at",
         ]
         read_only_fields = [
             "id",
             "user",
             "is_verified",
-            "last_sync",
+            "last_used",
+            "usage_count",
             "created_at",
             "updated_at",
         ]
+        extra_kwargs = {"credentials": {"write_only": True}}
 
     def create(self, validated_data):
         """Create integration with user from context."""
@@ -96,10 +107,10 @@ class IntegrationListSerializer(serializers.ModelSerializer):
             "id",
             "category_name",
             "service_name",
-            "name",
+            "display_name",
             "is_active",
             "is_verified",
-            "last_sync",
+            "last_used",
             "created_at",
         ]
 
@@ -107,7 +118,9 @@ class IntegrationListSerializer(serializers.ModelSerializer):
 class IntegrationLogSerializer(serializers.ModelSerializer):
     """Serializer for IntegrationLog model."""
 
-    integration_name = serializers.CharField(source="integration.name", read_only=True)
+    integration_name = serializers.CharField(
+        source="integration.display_name", read_only=True
+    )
 
     class Meta:
         model = IntegrationLog
@@ -115,11 +128,13 @@ class IntegrationLogSerializer(serializers.ModelSerializer):
             "id",
             "integration",
             "integration_name",
+            "user",
+            "level",
             "action",
-            "status",
-            "request_data",
-            "response_data",
-            "error_message",
+            "message",
+            "data",
+            "ip_address",
+            "user_agent",
             "created_at",
         ]
         read_only_fields = ["id", "created_at"]
@@ -128,7 +143,10 @@ class IntegrationLogSerializer(serializers.ModelSerializer):
 class WebhookEndpointSerializer(serializers.ModelSerializer):
     """Serializer for WebhookEndpoint model."""
 
-    integration_name = serializers.CharField(source="integration.name", read_only=True)
+    integration_name = serializers.CharField(
+        source="integration.display_name", read_only=True
+    )
+    url = serializers.SerializerMethodField()
 
     class Meta:
         model = WebhookEndpoint
@@ -138,27 +156,20 @@ class WebhookEndpointSerializer(serializers.ModelSerializer):
             "integration_name",
             "name",
             "url",
-            "secret_key",
+            "url_path",
+            "secret",
             "is_active",
+            "allowed_ips",
+            "headers",
+            "payload_schema",
             "created_at",
             "updated_at",
         ]
-        read_only_fields = ["id", "url", "secret_key", "created_at", "updated_at"]
+        read_only_fields = ["id", "url", "created_at", "updated_at"]
 
-    def create(self, validated_data):
-        """Create webhook endpoint with generated URL and secret."""
-        import uuid
-        import hashlib
-
-        # Generate unique URL path
-        url_path = str(uuid.uuid4())
-        validated_data["url"] = f"/api/webhooks/{url_path}/"
-
-        # Generate secret key
-        secret_key = hashlib.sha256(str(uuid.uuid4()).encode()).hexdigest()
-        validated_data["secret_key"] = secret_key
-
-        return super().create(validated_data)
+    def get_url(self, obj):
+        """Get full webhook URL."""
+        return obj.full_url
 
 
 class WebhookEventSerializer(serializers.ModelSerializer):
@@ -172,12 +183,15 @@ class WebhookEventSerializer(serializers.ModelSerializer):
             "id",
             "endpoint",
             "endpoint_name",
-            "event_type",
-            "payload",
+            "status",
             "headers",
-            "processed",
-            "created_at",
+            "payload",
+            "response_data",
+            "ip_address",
+            "user_agent",
             "processed_at",
+            "error_message",
+            "created_at",
         ]
         read_only_fields = ["id", "created_at", "processed_at"]
 

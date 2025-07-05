@@ -1,7 +1,9 @@
 'use client'
 
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import {
+  AlertTriangle,
   Book,
   Check,
   ChevronDown,
@@ -224,6 +226,22 @@ export function ApiDocumentation() {
   )
   const [testingEndpoint, setTestingEndpoint] = useState<string | null>(null)
   const [testResults, setTestResults] = useState<Record<string, any>>({})
+  const [schemaError, setSchemaError] = useState<boolean>(false)
+
+  // Error handling for schema loading
+  if (schemaError) {
+    return (
+      <Alert className="mb-6">
+        <AlertTriangle className="h-4 w-4" />
+        <AlertTitle>API Schema Unavailable</AlertTitle>
+        <AlertDescription>
+          The API schema could not be loaded. This documentation is still
+          available in static mode. Please check if the API server is running or
+          use the Swagger/ReDoc links above for interactive documentation.
+        </AlertDescription>
+      </Alert>
+    )
+  }
 
   const filteredEndpoints = apiEndpoints.filter(
     endpoint =>

@@ -107,6 +107,7 @@ dump.rdb
 *.tmp
 *.temp
 .cache
+temp/
 
 # migrations
 migrations

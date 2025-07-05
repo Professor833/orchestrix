@@ -218,6 +218,17 @@ SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": False,
     "COMPONENT_SPLIT_REQUEST": True,
     "SCHEMA_PATH_PREFIX": "/api/v1/",
+    "SERVE_AUTHENTICATION": None,
+    "SERVE_PERMISSIONS": ["rest_framework.permissions.AllowAny"],
+    "CAMELIZE_NAMES": True,
+    "ENUM_NAME_OVERRIDES": {
+        "WorkflowNodeTypeEnum": "apps.workflows.models.WorkflowNode.NODE_TYPE_CHOICES",
+        "WorkflowStatusEnum": "apps.workflows.models.Workflow.STATUS_CHOICES",
+        "WorkflowTriggerEnum": "apps.workflows.models.Workflow.TRIGGER_CHOICES",
+        "WorkflowTemplateCategoryEnum": "apps.workflows.models.WorkflowTemplate.CATEGORY_CHOICES",
+    },
+    "COMPONENT_NO_READ_ONLY_REQUIRED": True,
+    "POSTPROCESSING_HOOKS": [],
 }
 
 # Logging Configuration

@@ -2,9 +2,13 @@
 Serializers for execution models.
 """
 
-from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import WorkflowExecution, NodeExecution, ExecutionMetrics
+
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
+from rest_framework import serializers
+
+from .models import ExecutionMetrics, NodeExecution, WorkflowExecution
 
 User = get_user_model()
 
@@ -15,6 +19,11 @@ class NodeExecutionSerializer(serializers.ModelSerializer):
     node_name = serializers.CharField(source="node.name", read_only=True)
     node_type = serializers.CharField(source="node.node_type", read_only=True)
     duration_seconds = serializers.SerializerMethodField()
+
+    # Add fields that don't exist in the model
+    error_data = serializers.CharField(
+        source="error_message", required=False, allow_blank=True
+    )
 
     class Meta:
         model = NodeExecution
@@ -35,6 +44,7 @@ class NodeExecutionSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["id", "started_at", "completed_at", "duration_seconds"]
 
+    @extend_schema_field(OpenApiTypes.FLOAT)
     def get_duration_seconds(self, obj):
         """Calculate execution duration in seconds."""
         if obj.started_at and obj.completed_at:
@@ -51,6 +61,13 @@ class WorkflowExecutionSerializer(serializers.ModelSerializer):
     node_executions = NodeExecutionSerializer(many=True, read_only=True)
     duration_seconds = serializers.SerializerMethodField()
     progress_percentage = serializers.SerializerMethodField()
+
+    # Add extra fields that don't exist in the model
+    trigger_data = serializers.JSONField(source="input_data", required=False)
+    result_data = serializers.JSONField(source="output_data", required=False)
+    error_data = serializers.CharField(
+        source="error_message", required=False, allow_blank=True
+    )
 
     class Meta:
         model = WorkflowExecution
@@ -79,6 +96,7 @@ class WorkflowExecutionSerializer(serializers.ModelSerializer):
             "progress_percentage",
         ]
 
+    @extend_schema_field(OpenApiTypes.FLOAT)
     def get_duration_seconds(self, obj):
         """Calculate execution duration in seconds."""
         if obj.started_at and obj.completed_at:
@@ -91,6 +109,7 @@ class WorkflowExecutionSerializer(serializers.ModelSerializer):
             return delta.total_seconds()
         return None
 
+    @extend_schema_field(OpenApiTypes.FLOAT)
     def get_progress_percentage(self, obj):
         """Calculate execution progress percentage."""
         total_nodes = obj.node_executions.count()
@@ -124,6 +143,7 @@ class WorkflowExecutionListSerializer(serializers.ModelSerializer):
             "duration_seconds",
         ]
 
+    @extend_schema_field(OpenApiTypes.FLOAT)
     def get_duration_seconds(self, obj):
         """Calculate execution duration in seconds."""
         if obj.started_at and obj.completed_at:
@@ -137,6 +157,9 @@ class ExecutionMetricsSerializer(serializers.ModelSerializer):
 
     workflow_name = serializers.CharField(source="workflow.name", read_only=True)
     user_email = serializers.EmailField(source="user.email", read_only=True)
+
+    # Map field names correctly
+    average_duration = serializers.DurationField(source="avg_duration", required=False)
 
     class Meta:
         model = ExecutionMetrics
@@ -158,6 +181,8 @@ class ExecutionMetricsSerializer(serializers.ModelSerializer):
 
 class ExecutionCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating new executions."""
+
+    trigger_data = serializers.JSONField(source="input_data", required=False)
 
     class Meta:
         model = WorkflowExecution

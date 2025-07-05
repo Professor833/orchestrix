@@ -2,15 +2,15 @@
 Integration models for external service connections and API integrations.
 """
 
-import uuid
-from django.db import models
-from django.contrib.auth import get_user_model
-from django.utils.translation import gettext_lazy as _
-from django.core.exceptions import ValidationError
-from cryptography.fernet import Fernet
-from django.conf import settings
-import json
 import base64
+import uuid
+
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.db import models
+from django.utils.translation import gettext_lazy as _
+
+from cryptography.fernet import Fernet, InvalidToken
 
 User = get_user_model()
 
@@ -132,7 +132,7 @@ class Integration(models.Model):
                 if isinstance(value, str):
                     try:
                         decrypted_creds[key_name] = f.decrypt(value.encode()).decode()
-                    except:
+                    except InvalidToken:
                         decrypted_creds[key_name] = (
                             value  # If decryption fails, return as-is
                         )
@@ -166,6 +166,13 @@ class IntegrationTemplate(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(_("name"), max_length=100)
+    category = models.ForeignKey(
+        IntegrationCategory,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="templates",
+    )
     service_name = models.CharField(_("service name"), max_length=100)
     service_type = models.CharField(_("service type"), max_length=20)
     description = models.TextField(_("description"))

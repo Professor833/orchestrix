@@ -2,8 +2,10 @@
 Serializers for workflow models.
 """
 
-from rest_framework import serializers
 from django.contrib.auth import get_user_model
+
+from rest_framework import serializers
+
 from .models import Workflow, WorkflowNode, WorkflowSchedule, WorkflowTemplate
 
 User = get_user_model()
@@ -13,6 +15,7 @@ class WorkflowTemplateSerializer(serializers.ModelSerializer):
     """Serializer for WorkflowTemplate model."""
 
     created_by_email = serializers.EmailField(source="created_by.email", read_only=True)
+    nodes = serializers.SerializerMethodField()
 
     class Meta:
         model = WorkflowTemplate
@@ -25,6 +28,7 @@ class WorkflowTemplateSerializer(serializers.ModelSerializer):
             "created_by_email",
             "workflow_config",
             "node_configs",
+            "nodes",
             "is_public",
             "usage_count",
             "created_at",
@@ -36,6 +40,35 @@ class WorkflowTemplateSerializer(serializers.ModelSerializer):
             "usage_count",
             "created_at",
             "updated_at",
+        ]
+
+    def get_nodes(self, obj):
+        """Get nodes from workflows created from this template."""
+        from apps.workflows.models import Workflow, WorkflowNode
+
+        # Find workflows created from this template
+        workflows = Workflow.objects.filter(
+            name__startswith=f"Temp Workflow for {obj.name}"
+        )
+
+        if not workflows.exists():
+            return []
+
+        # Get nodes from the first workflow
+        workflow = workflows.first()
+        nodes = WorkflowNode.objects.filter(workflow=workflow)
+
+        # Manually create a simplified representation of the nodes
+        return [
+            {
+                "id": str(node.id),
+                "node_type": node.node_type,
+                "name": node.name,
+                "description": node.configuration.get("description", ""),
+                "position_x": node.position_x,
+                "position_y": node.position_y,
+            }
+            for node in nodes
         ]
 
 
@@ -130,6 +163,9 @@ class WorkflowSerializer(serializers.ModelSerializer):
             "nodes",
             "schedule",
             "last_execution",
+            "category",
+            "tags",
+            "last_run_at",
             "created_at",
             "updated_at",
         ]
@@ -240,6 +276,9 @@ class WorkflowListSerializer(serializers.ModelSerializer):
             "trigger_type",
             "node_count",
             "last_execution_status",
+            "category",
+            "tags",
+            "last_run_at",
             "created_at",
             "updated_at",
         ]
