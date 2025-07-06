@@ -2,21 +2,33 @@ import random
 from datetime import timedelta
 
 from django.core.management.base import BaseCommand
+from django.db import transaction
 from django.utils import timezone
+from faker import Faker
 
 from apps.executions.models import ExecutionMetrics, NodeExecution, WorkflowExecution
-from apps.integrations.models import IntegrationCategory, IntegrationTemplate
+from apps.integrations.models import (
+    IntegrationCategory,
+    IntegrationTemplate,
+    WebhookEndpoint,
+)
 from apps.workflows.models import Workflow
 
 
 class Command(BaseCommand):
-    help = "Populates the database with additional real-world data for integrations and executions."
+    help = (
+        "Populates the database with additional real-world data for integrations "
+        "and executions."
+    )
 
     def handle(self, *args, **kwargs):
-        self.stdout.write("Starting data population...")
+        fake = Faker()
+        self.stdout.write(self.style.SUCCESS("Starting to populate real-world data..."))
 
-        self.create_integration_data()
-        self.create_execution_data()
+        with transaction.atomic():
+            self.create_integration_data()
+            self.create_execution_data()
+            self._create_webhook_endpoints(fake)
 
         self.stdout.write(
             self.style.SUCCESS(
@@ -28,17 +40,14 @@ class Command(BaseCommand):
         self.stdout.write("Creating integration categories and templates...")
 
         # Categories
-        communication_cat, _ = IntegrationCategory.objects.get_or_create(
-            name="Communication",
-            defaults={"description": "Tools for team communication and notifications."},
+        communication_cat = self._get_or_create_category(
+            "Communication", "Tools for team communication and notifications."
         )
-        productivity_cat, _ = IntegrationCategory.objects.get_or_create(
-            name="Productivity",
-            defaults={"description": "Integrations to boost team productivity."},
+        _productivity_cat = self._get_or_create_category(
+            "Productivity", "Integrations to boost team productivity."
         )
-        dev_tools_cat, _ = IntegrationCategory.objects.get_or_create(
-            name="Developer Tools",
-            defaults={"description": "Tools for software development and CI/CD."},
+        dev_tools_cat = self._get_or_create_category(
+            "Developer Tools", "Tools for software development and CI/CD."
         )
 
         # Templates
@@ -143,3 +152,59 @@ class Command(BaseCommand):
                     )
 
         self.stdout.write(self.style.SUCCESS("Execution data created."))
+
+    def _get_or_create_category(self, name, description):
+        category, created = IntegrationCategory.objects.get_or_create(
+            name=name, defaults={"description": description}
+        )
+        if created:
+            self.stdout.write(
+                self.style.SUCCESS(f"Created integration category: {name}")
+            )
+        return category
+
+    def _create_webhook_endpoints(self, fake):
+        self.stdout.write("Creating webhook endpoints...")
+        workflows = list(Workflow.objects.all())
+        if not workflows:
+            self.stdout.write(
+                self.style.WARNING(
+                    "No workflows found. Cannot create webhook endpoints."
+                )
+            )
+            return
+
+        webhooks_data = [
+            {
+                "name": "GitHub Push Webhook",
+                "description": "Triggers on a push event to the main branch.",
+                "target_url": f"https://{fake.domain_name()}/webhooks/github/push",
+            },
+            {
+                "name": "Stripe Payment Succeeded Webhook",
+                "description": "Triggers on successful payment events from Stripe.",
+                "target_url": f"https://{fake.domain_name()}/webhooks/stripe/payment",
+            },
+            {
+                "name": "Slack Mention Webhook",
+                "description": "Triggers when the bot is mentioned in a Slack channel.",
+                "target_url": f"https://{fake.domain_name()}/webhooks/slack/mention",
+            },
+        ]
+
+        for i, data in enumerate(webhooks_data):
+            workflow = workflows[i % len(workflows)]
+            webhook, created = WebhookEndpoint.objects.get_or_create(
+                name=data["name"],
+                defaults={
+                    "description": data["description"],
+                    "target_url": data["target_url"],
+                    "workflow": workflow,
+                    "created_by": workflow.user,
+                },
+            )
+
+            if created:
+                self.stdout.write(
+                    self.style.SUCCESS(f"Created webhook endpoint: {webhook.name}")
+                )

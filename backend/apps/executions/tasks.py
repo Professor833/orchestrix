@@ -4,11 +4,13 @@ Celery tasks for execution management and cleanup.
 
 import logging
 from datetime import timedelta
+
 from celery import shared_task
-from django.utils import timezone
 from django.db import models
-from django.db.models import Count, Avg
-from .models import WorkflowExecution, ExecutionMetrics
+from django.db.models import Avg, Count
+from django.utils import timezone
+
+from .models import ExecutionMetrics, WorkflowExecution
 
 logger = logging.getLogger(__name__)
 
@@ -198,8 +200,8 @@ def send_execution_notifications(execution_id, notification_type="completed"):
             return {"status": "skipped", "reason": "Unknown notification type"}
 
         # Send email notification
-        from django.core.mail import send_mail
         from django.conf import settings
+        from django.core.mail import send_mail
 
         send_mail(
             subject,

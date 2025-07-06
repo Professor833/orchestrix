@@ -1,6 +1,5 @@
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
-
 from django_ratelimit.decorators import ratelimit
 from rest_framework import permissions, status
 from rest_framework.generics import RetrieveUpdateAPIView

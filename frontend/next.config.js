@@ -5,6 +5,7 @@ const nextConfig = {
     // Remove deprecated options (appDir and serverComponents are now stable)
     typedRoutes: true,
   },
+  transpilePackages: ['@tanstack/react-query'],
   images: {
     domains: ['localhost', '127.0.0.1'],
     unoptimized: process.env.NODE_ENV === 'development',
@@ -33,6 +34,19 @@ const nextConfig = {
   },
   // Enable output for Docker
   output: 'standalone',
+
+  webpack: (config, { isServer }) => {
+    // Handle TanStack Query bundling issues
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+      }
+    }
+    return config
+  },
 }
 
 module.exports = nextConfig

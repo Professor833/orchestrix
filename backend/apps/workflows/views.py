@@ -3,7 +3,6 @@ Views for workflow management.
 """
 
 from django.db import models, transaction
-
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
@@ -129,13 +128,14 @@ class WorkflowViewSet(viewsets.ModelViewSet):
             )
 
         # Import here to avoid circular imports
-        from apps.workflows.tasks import execute_workflow_task
+        from apps.workflows.tasks import execute_workflow
 
         # Execute workflow asynchronously
-        task = execute_workflow_task.delay(
+        task = execute_workflow.delay(
             workflow_id=str(workflow.id),
-            trigger_data=request.data.get("trigger_data", {}),
             user_id=str(request.user.id),
+            input_data=request.data.get("trigger_data", {}),
+            trigger_source="manual",
         )
 
         return Response(

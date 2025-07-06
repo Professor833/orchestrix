@@ -6,7 +6,6 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
 from rest_framework import serializers
 
 from .models import Account, User

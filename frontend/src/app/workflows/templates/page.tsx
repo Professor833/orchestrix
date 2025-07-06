@@ -104,7 +104,12 @@ export default function WorkflowTemplatesPage() {
     }: {
       templateId: string
       data: { name: string; description?: string }
-    }) => workflowService.createWorkflowFromTemplate(templateId, data),
+    }) =>
+      workflowService.createWorkflowFromTemplate(
+        templateId,
+        data.name,
+        data.description || ''
+      ),
     onSuccess: workflow => {
       toast.success('Workflow created successfully!')
       queryClient.invalidateQueries({ queryKey: ['workflows'] })
@@ -354,7 +359,9 @@ export default function WorkflowTemplatesPage() {
                       </div>
                       <div className="flex items-center text-sm text-gray-500">
                         <Clock className="mr-1 h-4 w-4" />
-                        {new Date(template.created_at).toLocaleDateString()}
+                        {new Date(
+                          (template as any).created_at
+                        ).toLocaleDateString()}
                       </div>
                     </div>
 
@@ -380,7 +387,9 @@ export default function WorkflowTemplatesPage() {
                     {/* Actions */}
                     <div className="flex space-x-2">
                       <Button
-                        onClick={() => handleCreateFromTemplate(template)}
+                        onClick={() =>
+                          handleCreateFromTemplate(template as any)
+                        }
                         className="flex-1"
                         disabled={createFromTemplateMutation.isPending}
                       >

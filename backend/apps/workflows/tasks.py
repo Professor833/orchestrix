@@ -3,9 +3,11 @@ Celery tasks for workflow execution.
 """
 
 import logging
+
 from celery import shared_task
-from django.utils import timezone
 from django.contrib.auth import get_user_model
+from django.utils import timezone
+
 from .models import Workflow, WorkflowNode
 
 logger = logging.getLogger(__name__)
@@ -110,7 +112,7 @@ def execute_workflow(
 def execute_node(self, execution_id, node_id, input_data):
     """Execute a single workflow node."""
     try:
-        from apps.executions.models import WorkflowExecution, NodeExecution
+        from apps.executions.models import NodeExecution, WorkflowExecution
 
         execution = WorkflowExecution.objects.get(id=execution_id)
         node = WorkflowNode.objects.get(id=node_id)
@@ -166,7 +168,8 @@ def execute_node(self, execution_id, node_id, input_data):
         try:
             node_execution.mark_as_failed(str(e))
             node_execution.add_log("error", f"Failed executing node: {str(e)}")
-        except:
+        except Exception as e:
+            logger.error(f"Error marking node execution as failed: {str(e)}")
             pass
 
         return {"status": "failed", "error": str(e)}
@@ -239,8 +242,8 @@ def _execute_api_call_node(node, input_data, node_execution):
 
 def _execute_email_node(node, input_data, node_execution):
     """Execute an email node."""
-    from django.core.mail import send_mail
     from django.conf import settings
+    from django.core.mail import send_mail
 
     config = node.configuration
     to_email = config.get("to_email")
@@ -285,7 +288,8 @@ def _execute_condition_node(node, input_data, node_execution):
         # Try to evaluate as a simple expression
         try:
             result = eval(condition, {"__builtins__": {}}, input_data)
-        except:
+        except Exception as e:
+            logger.error(f"Error evaluating condition: {str(e)}")
             result = False
 
     node_execution.add_log("info", f"Condition '{condition}' evaluated to: {result}")

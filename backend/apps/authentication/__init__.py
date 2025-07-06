@@ -11,6 +11,7 @@ Currently includes:
 
 See apps/authentication/patches/README.md for detailed documentation.
 """
-from .patches import jwt_version  # Import patch before rest_framework_simplejwt
+
+from .patches import jwt_version  # noqa: F401
 
 default_app_config = "apps.authentication.apps.AuthenticationConfig"

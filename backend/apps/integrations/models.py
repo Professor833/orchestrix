@@ -5,12 +5,11 @@ Integration models for external service connections and API integrations.
 import base64
 import uuid
 
+from cryptography.fernet import Fernet, InvalidToken
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-
-from cryptography.fernet import Fernet, InvalidToken
 
 User = get_user_model()
 

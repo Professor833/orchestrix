@@ -1,5 +1,5 @@
 """
-Monkey patch for djangorestframework-simplejwt to fix pkg_resources deprecation warnings.
+Monkey patch for djangorestframework-simplejwt to fix pkg_resources deprecation warnings.  # noqa: E501
 
 PROBLEM:
 --------

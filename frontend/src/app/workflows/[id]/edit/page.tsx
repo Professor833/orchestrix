@@ -8,7 +8,6 @@ import { Workflow } from '@/types'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   ArrowLeft,
-  ArrowRight,
   Code,
   Database,
   Play,
@@ -200,7 +199,6 @@ export default function WorkflowEditPage() {
           config: node.config,
           position: node.position,
         })),
-        connections: [], // TODO: Add connection logic
       },
     }
 
@@ -212,7 +210,7 @@ export default function WorkflowEditPage() {
 
     try {
       await workflowService.executeWorkflow(workflow.id)
-      toast.success('Test execution started!')
+      toast.success('Workflow execution started!')
     } catch (error: any) {
       toast.error('Failed to execute workflow', {
         description: error.response?.data?.detail || error.message,
@@ -255,211 +253,220 @@ export default function WorkflowEditPage() {
   }
 
   return (
-    <div className="container mx-auto p-4 sm:p-6 lg:p-8">
-      <div className="mb-6 flex items-center justify-between">
-        <Button
-          variant="ghost"
-          onClick={() => router.push(`/workflows/${id}` as Route)}
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Workflow
-        </Button>
-
-        <div className="flex items-center space-x-2">
-          <Button variant="outline" onClick={handleTest}>
-            <Play className="mr-2 h-4 w-4" />
-            Test Workflow
-          </Button>
-          <Button
-            onClick={handleSave}
-            disabled={updateWorkflowMutation.isPending}
-          >
-            <Save className="mr-2 h-4 w-4" />
-            {updateWorkflowMutation.isPending ? 'Saving...' : 'Save Changes'}
-          </Button>
-        </div>
-      </div>
-
-      <div className="mb-6">
-        <h1 className="mb-2 text-2xl font-bold">Edit Workflow</h1>
-        <p className="text-gray-600">
-          Make changes to your workflow configuration and nodes.
-        </p>
-      </div>
-
-      <div className="flex h-[800px] overflow-hidden rounded-lg border border-gray-200 bg-white">
-        {/* Left Sidebar - Workflow Settings */}
-        <div className="w-80 overflow-y-auto border-r border-gray-200 p-6">
-          <div className="space-y-6">
-            <div>
-              <h3 className="mb-4 text-lg font-medium text-gray-900">
-                Workflow Settings
-              </h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">
-                    Workflow Name
-                  </label>
-                  <input
-                    type="text"
-                    value={workflowName}
-                    onChange={e => setWorkflowName(e.target.value)}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter workflow name"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">
-                    Description
-                  </label>
-                  <textarea
-                    value={workflowDescription}
-                    onChange={e => setWorkflowDescription(e.target.value)}
-                    rows={3}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Describe what this workflow does"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <h3 className="mb-4 text-lg font-medium text-gray-900">
-                Add Nodes
-              </h3>
-              <div className="space-y-2">
-                {nodeTypes.map(nodeType => (
-                  <button
-                    key={nodeType.type}
-                    onClick={() =>
-                      addNode(nodeType.type as WorkflowBuilderNode['type'])
-                    }
-                    className="flex w-full items-center rounded-md border border-gray-200 px-3 py-2 text-left transition-colors hover:bg-gray-50"
-                  >
-                    <div className={`rounded-md p-2 ${nodeType.color} mr-3`}>
-                      <nodeType.icon className="h-4 w-4" />
-                    </div>
-                    <span className="text-sm font-medium">{nodeType.name}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {selectedNode && (
-              <div>
-                <h3 className="mb-4 text-lg font-medium text-gray-900">
-                  Node Settings
-                </h3>
-                <div className="space-y-4">
-                  <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
-                      Node Name
-                    </label>
-                    <input
-                      type="text"
-                      value={selectedNode.name}
-                      onChange={e =>
-                        updateNode(selectedNode.id, { name: e.target.value })
-                      }
-                      className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
-                      Description
-                    </label>
-                    <textarea
-                      value={selectedNode.description}
-                      onChange={e =>
-                        updateNode(selectedNode.id, {
-                          description: e.target.value,
-                        })
-                      }
-                      rows={2}
-                      className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => removeNode(selectedNode.id)}
-                    className="w-full"
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Remove Node
-                  </Button>
-                </div>
-              </div>
-            )}
+    <div className="flex h-screen bg-gray-50">
+      {/* Sidebar */}
+      <div className="flex w-80 flex-col border-r border-gray-200 bg-white">
+        <div className="border-b border-gray-200 p-4">
+          <div className="mb-4 flex items-center justify-between">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => router.push(`/workflows/${id}` as Route)}
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Workflow
+            </Button>
+          </div>
+          <div className="space-y-2">
+            <input
+              type="text"
+              value={workflowName}
+              onChange={e => setWorkflowName(e.target.value)}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Workflow Name"
+            />
+            <textarea
+              value={workflowDescription}
+              onChange={e => setWorkflowDescription(e.target.value)}
+              className="w-full resize-none rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Workflow Description"
+              rows={3}
+            />
           </div>
         </div>
 
-        {/* Main Canvas */}
-        <div className="relative flex-1 overflow-hidden bg-gray-50">
-          <div className="absolute inset-0 p-6">
-            <div className="relative h-full rounded-lg border-2 border-dashed border-gray-300">
-              {nodes.length === 0 ? (
-                <div className="flex h-full items-center justify-center">
-                  <div className="text-center">
-                    <Zap className="mx-auto mb-4 h-12 w-12 text-gray-400" />
-                    <h3 className="mb-2 text-lg font-medium text-gray-900">
-                      No Nodes in Workflow
-                    </h3>
-                    <p className="mb-4 text-gray-500">
-                      Add nodes from the sidebar to begin building your workflow
+        {/* Node Types */}
+        <div className="border-b border-gray-200 p-4">
+          <h3 className="mb-3 font-semibold">Add Nodes</h3>
+          <div className="space-y-2">
+            {nodeTypes.map(nodeType => {
+              const Icon = nodeType.icon
+              return (
+                <button
+                  key={nodeType.type}
+                  onClick={() =>
+                    addNode(nodeType.type as WorkflowBuilderNode['type'])
+                  }
+                  className={`flex w-full items-center rounded-lg border border-gray-200 p-3 transition-colors hover:border-gray-300 ${nodeType.color}`}
+                >
+                  <Icon className="mr-3 h-5 w-5" />
+                  <span className="font-medium">{nodeType.name}</span>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Node Properties */}
+        {selectedNode && (
+          <div className="flex-1 overflow-y-auto p-4">
+            <h3 className="mb-3 font-semibold">Node Properties</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  Name
+                </label>
+                <input
+                  type="text"
+                  value={selectedNode.name}
+                  onChange={e =>
+                    updateNode(selectedNode.id, { name: e.target.value })
+                  }
+                  className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  Description
+                </label>
+                <textarea
+                  value={selectedNode.description}
+                  onChange={e =>
+                    updateNode(selectedNode.id, { description: e.target.value })
+                  }
+                  className="w-full resize-none rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  rows={3}
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  Type
+                </label>
+                <select
+                  value={selectedNode.type}
+                  onChange={e =>
+                    updateNode(selectedNode.id, {
+                      type: e.target.value as WorkflowBuilderNode['type'],
+                    })
+                  }
+                  className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  {nodeTypes.map(nodeType => (
+                    <option key={nodeType.type} value={nodeType.type}>
+                      {nodeType.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Action Buttons */}
+        <div className="border-t border-gray-200 p-4">
+          <div className="flex space-x-2">
+            <Button
+              onClick={handleSave}
+              disabled={updateWorkflowMutation.isPending}
+              className="flex-1"
+            >
+              {updateWorkflowMutation.isPending ? (
+                <LoadingSpinner className="mr-2 h-4 w-4" />
+              ) : (
+                <Save className="mr-2 h-4 w-4" />
+              )}
+              Save
+            </Button>
+            <Button onClick={handleTest} variant="outline" className="flex-1">
+              <Play className="mr-2 h-4 w-4" />
+              Test
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Canvas */}
+      <div className="relative flex-1 overflow-hidden">
+        <div className="absolute inset-0 bg-gray-50">
+          <div className="relative h-full w-full">
+            {/* Grid background */}
+            <div
+              className="absolute inset-0 opacity-20"
+              style={{
+                backgroundImage: `
+                  linear-gradient(to right, #e5e7eb 1px, transparent 1px),
+                  linear-gradient(to bottom, #e5e7eb 1px, transparent 1px)
+                `,
+                backgroundSize: '20px 20px',
+              }}
+            />
+
+            {/* Nodes */}
+            {nodes.map(node => {
+              const nodeTypeConfig = nodeTypes.find(nt => nt.type === node.type)
+              const Icon = nodeTypeConfig?.icon || Settings
+
+              return (
+                <div
+                  key={node.id}
+                  className={`absolute cursor-pointer rounded-lg border-2 bg-white shadow-lg transition-all duration-200 ${
+                    selectedNode?.id === node.id
+                      ? 'border-blue-500 shadow-xl'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                  style={{
+                    left: node.position.x,
+                    top: node.position.y,
+                    width: '200px',
+                    minHeight: '100px',
+                  }}
+                  onClick={() => setSelectedNode(node)}
+                >
+                  <div className="p-4">
+                    <div className="mb-2 flex items-center justify-between">
+                      <div
+                        className={`flex items-center ${nodeTypeConfig?.color || 'bg-gray-100 text-gray-600'} rounded px-2 py-1 text-xs font-medium`}
+                      >
+                        <Icon className="mr-1 h-3 w-3" />
+                        {node.type}
+                      </div>
+                      <button
+                        onClick={e => {
+                          e.stopPropagation()
+                          removeNode(node.id)
+                        }}
+                        className="text-red-500 transition-colors hover:text-red-700"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <h4 className="mb-1 truncate text-sm font-semibold">
+                      {node.name}
+                    </h4>
+                    <p className="line-clamp-2 text-xs text-gray-600">
+                      {node.description || 'No description'}
                     </p>
                   </div>
                 </div>
-              ) : (
-                <div className="relative h-full">
-                  {nodes.map((node, index) => {
-                    const nodeType = nodeTypes.find(nt => nt.type === node.type)
-                    return (
-                      <div
-                        key={node.id}
-                        className={`absolute cursor-pointer rounded-lg border-2 bg-white p-4 transition-all ${
-                          selectedNode?.id === node.id
-                            ? 'border-blue-500 shadow-lg'
-                            : 'border-gray-200 hover:border-gray-300'
-                        }`}
-                        style={{
-                          left: node.position.x,
-                          top: node.position.y,
-                          width: '200px',
-                        }}
-                        onClick={() => setSelectedNode(node)}
-                      >
-                        <div className="mb-2 flex items-center">
-                          <div
-                            className={`rounded-md p-2 ${nodeType?.color} mr-3`}
-                          >
-                            {nodeType?.icon && (
-                              <nodeType.icon className="h-4 w-4" />
-                            )}
-                          </div>
-                          <span className="text-sm font-medium">
-                            {node.name}
-                          </span>
-                        </div>
-                        {node.description && (
-                          <p className="mb-2 text-xs text-gray-500">
-                            {node.description}
-                          </p>
-                        )}
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs capitalize text-gray-400">
-                            {node.type}
-                          </span>
-                          {index < nodes.length - 1 && (
-                            <ArrowRight className="h-4 w-4 text-gray-400" />
-                          )}
-                        </div>
-                      </div>
-                    )
-                  })}
+              )
+            })}
+
+            {/* Empty state */}
+            {nodes.length === 0 && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="mb-4 text-gray-400">
+                    <Settings className="mx-auto h-16 w-16" />
+                  </div>
+                  <h3 className="mb-2 text-lg font-semibold text-gray-600">
+                    No nodes yet
+                  </h3>
+                  <p className="max-w-md text-gray-500">
+                    Add nodes from the sidebar to start building your workflow
+                  </p>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

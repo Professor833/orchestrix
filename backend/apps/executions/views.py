@@ -2,24 +2,23 @@
 Views for execution management.
 """
 
-from rest_framework import viewsets, status
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters
-from django.db.models import Count, Avg, Sum
-from django.db import models
-from django.utils import timezone
 from datetime import timedelta
 
-from .models import WorkflowExecution, NodeExecution, ExecutionMetrics
+from django.db import models
+from django.utils import timezone
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+
+from .models import ExecutionMetrics, NodeExecution, WorkflowExecution
 from .serializers import (
-    WorkflowExecutionSerializer,
-    WorkflowExecutionListSerializer,
     ExecutionCreateSerializer,
-    NodeExecutionSerializer,
     ExecutionMetricsSerializer,
+    NodeExecutionSerializer,
+    WorkflowExecutionListSerializer,
+    WorkflowExecutionSerializer,
 )
 
 
@@ -58,14 +57,14 @@ class WorkflowExecutionViewSet(viewsets.ModelViewSet):
         execution = serializer.save(user=self.request.user)
 
         # Import here to avoid circular imports
-        from apps.workflows.tasks import execute_workflow_task
+        from apps.workflows.tasks import execute_workflow
 
         # Start async execution
-        execute_workflow_task.delay(
+        execute_workflow.delay(
             workflow_id=str(execution.workflow.id),
-            execution_id=str(execution.id),
-            trigger_data=execution.trigger_data,
             user_id=str(self.request.user.id),
+            input_data=execution.input_data,
+            trigger_source="manual",
         )
 
     @action(detail=True, methods=["post"])
@@ -103,22 +102,22 @@ class WorkflowExecutionViewSet(viewsets.ModelViewSet):
             )
 
         # Import here to avoid circular imports
-        from apps.workflows.tasks import execute_workflow_task
+        from apps.workflows.tasks import execute_workflow
 
         # Create new execution for retry
         new_execution = WorkflowExecution.objects.create(
             workflow=execution.workflow,
             user=execution.user,
-            trigger_data=execution.trigger_data,
+            input_data=execution.input_data,
             status="pending",
         )
 
         # Start async execution
-        execute_workflow_task.delay(
+        execute_workflow.delay(
             workflow_id=str(new_execution.workflow.id),
-            execution_id=str(new_execution.id),
-            trigger_data=new_execution.trigger_data,
             user_id=str(request.user.id),
+            input_data=new_execution.input_data,
+            trigger_source="retry",
         )
 
         serializer = self.get_serializer(new_execution)
@@ -260,12 +259,12 @@ class ExecutionMetricsViewSet(viewsets.ReadOnlyModelViewSet):
             )["total"]
             or 0,
             "average_daily_executions": recent_metrics.aggregate(
-                avg=Avg("total_executions")
+                avg=models.Avg("total_executions")
             )["avg"]
             or 0,
-            "average_duration": recent_metrics.aggregate(avg=Avg("average_duration"))[
-                "avg"
-            ]
+            "average_duration": recent_metrics.aggregate(
+                avg=models.Avg("average_duration")
+            )["avg"]
             or 0,
         }
 
