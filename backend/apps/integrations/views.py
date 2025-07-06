@@ -59,9 +59,7 @@ class IntegrationTemplateViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         """Get active templates."""
-        return IntegrationTemplate.objects.filter(is_active=True).select_related(
-            "category"
-        )
+        return IntegrationTemplate.objects.filter(is_active=True).select_related("category")
 
 
 class IntegrationViewSet(viewsets.ModelViewSet):
@@ -86,9 +84,7 @@ class IntegrationViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """Get integrations for the current user."""
-        return Integration.objects.filter(user=self.request.user).select_related(
-            "category"
-        )
+        return Integration.objects.filter(user=self.request.user).select_related("category")
 
     def get_serializer_class(self):
         """Return appropriate serializer based on action."""
@@ -101,9 +97,7 @@ class IntegrationViewSet(viewsets.ModelViewSet):
         """Test integration connection."""
         integration = self.get_object()
 
-        serializer = IntegrationTestSerializer(
-            data={}, context={"integration": integration}
-        )
+        serializer = IntegrationTestSerializer(data={}, context={"integration": integration})
 
         if serializer.is_valid():
             # Update integration verification status
@@ -129,9 +123,7 @@ class IntegrationViewSet(viewsets.ModelViewSet):
         """Sync integration data."""
         integration = self.get_object()
 
-        serializer = IntegrationSyncSerializer(
-            data=request.data, context={"integration": integration}
-        )
+        serializer = IntegrationSyncSerializer(data=request.data, context={"integration": integration})
 
         if serializer.is_valid():
             # Update last used time
@@ -167,9 +159,7 @@ class IntegrationViewSet(viewsets.ModelViewSet):
         """Get integration logs."""
         integration = self.get_object()
 
-        logs = IntegrationLog.objects.filter(integration=integration).order_by(
-            "-created_at"
-        )
+        logs = IntegrationLog.objects.filter(integration=integration).order_by("-created_at")
 
         # Pagination
         page = self.paginate_queryset(logs)
@@ -202,9 +192,7 @@ class IntegrationLogViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         """Get logs for integrations owned by the current user."""
-        return IntegrationLog.objects.filter(
-            integration__user=self.request.user
-        ).select_related("integration")
+        return IntegrationLog.objects.filter(integration__user=self.request.user).select_related("integration")
 
 
 class WebhookEndpointViewSet(viewsets.ModelViewSet):
@@ -224,17 +212,13 @@ class WebhookEndpointViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """Get webhook endpoints for integrations owned by the current user."""
-        return WebhookEndpoint.objects.filter(
-            integration__user=self.request.user
-        ).select_related("integration")
+        return WebhookEndpoint.objects.filter(integration__user=self.request.user).select_related("integration")
 
     def perform_create(self, serializer):
         """Ensure user owns the integration."""
         integration = serializer.validated_data["integration"]
         if integration.user != self.request.user:
-            raise PermissionError(
-                "You don't have permission to create webhooks for this integration."
-            )
+            raise PermissionError("You don't have permission to create webhooks for this integration.")
         serializer.save()
 
     @action(detail=True, methods=["post"])
@@ -282,6 +266,4 @@ class WebhookEventViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         """Get webhook events for endpoints owned by the current user."""
-        return WebhookEvent.objects.filter(
-            endpoint__integration__user=self.request.user
-        ).select_related("endpoint")
+        return WebhookEvent.objects.filter(endpoint__integration__user=self.request.user).select_related("endpoint")

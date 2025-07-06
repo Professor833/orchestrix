@@ -15,17 +15,13 @@ User = get_user_model()
 
 
 @shared_task(bind=True)
-def execute_workflow(
-    self, workflow_id, user_id, input_data=None, trigger_source="manual"
-):
+def execute_workflow(self, workflow_id, user_id, input_data=None, trigger_source="manual"):
     """Execute a complete workflow."""
     try:
         workflow = Workflow.objects.get(id=workflow_id)
         user = User.objects.get(id=user_id)
 
-        logger.info(
-            f"Starting workflow execution: {workflow.name} for user {user.email}"
-        )
+        logger.info(f"Starting workflow execution: {workflow.name} for user {user.email}")
 
         # Create workflow execution record
         from apps.executions.models import WorkflowExecution
@@ -43,9 +39,7 @@ def execute_workflow(
         )
 
         # Get workflow nodes in execution order
-        nodes = workflow.nodes.filter(parent_node__isnull=True).order_by(
-            "position_x", "position_y"
-        )
+        nodes = workflow.nodes.filter(parent_node__isnull=True).order_by("position_x", "position_y")
 
         results = {}
         current_data = input_data or {}
@@ -56,18 +50,14 @@ def execute_workflow(
                 logger.info(f"Executing node: {node.name}")
 
                 # Execute the node
-                node_result = execute_node.delay(
-                    execution.id, node.id, current_data
-                ).get()  # Wait for node completion
+                node_result = execute_node.delay(execution.id, node.id, current_data).get()  # Wait for node completion
 
                 if node_result["status"] == "completed":
                     results[str(node.id)] = node_result["output"]
                     current_data.update(node_result["output"])
                 elif node_result["status"] == "failed":
                     # Node failed, mark execution as failed
-                    execution.mark_as_failed(
-                        f"Node {node.name} failed: {node_result.get('error', 'Unknown error')}"
-                    )
+                    execution.mark_as_failed(f"Node {node.name} failed: {node_result.get('error', 'Unknown error')}")
                     return {
                         "status": "failed",
                         "error": f"Node {node.name} failed",
@@ -226,9 +216,7 @@ def _execute_api_call_node(node, input_data, node_execution):
             "status_code": response.status_code,
             "response_data": (
                 response.json()
-                if response.headers.get("content-type", "").startswith(
-                    "application/json"
-                )
+                if response.headers.get("content-type", "").startswith("application/json")
                 else response.text
             ),
             "url": url,

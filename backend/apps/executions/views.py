@@ -83,9 +83,7 @@ class WorkflowExecutionViewSet(viewsets.ModelViewSet):
         execution.save(update_fields=["status", "completed_at"])
 
         # Cancel running node executions
-        execution.node_executions.filter(status="running").update(
-            status="cancelled", completed_at=timezone.now()
-        )
+        execution.node_executions.filter(status="running").update(status="cancelled", completed_at=timezone.now())
 
         serializer = self.get_serializer(execution)
         return Response(serializer.data)
@@ -136,24 +134,16 @@ class WorkflowExecutionViewSet(viewsets.ModelViewSet):
 
         stats = {
             "total_executions": recent_executions.count(),
-            "successful_executions": recent_executions.filter(
-                status="completed"
-            ).count(),
+            "successful_executions": recent_executions.filter(status="completed").count(),
             "failed_executions": recent_executions.filter(status="failed").count(),
             "running_executions": recent_executions.filter(status="running").count(),
-            "cancelled_executions": recent_executions.filter(
-                status="cancelled"
-            ).count(),
+            "cancelled_executions": recent_executions.filter(status="cancelled").count(),
             "average_duration": None,
-            "workflows_executed": recent_executions.values("workflow")
-            .distinct()
-            .count(),
+            "workflows_executed": recent_executions.values("workflow").distinct().count(),
         }
 
         # Calculate average duration for completed executions
-        completed_executions = recent_executions.filter(
-            status="completed", completed_at__isnull=False
-        )
+        completed_executions = recent_executions.filter(status="completed", completed_at__isnull=False)
 
         if completed_executions.exists():
             durations = []
@@ -180,9 +170,9 @@ class NodeExecutionViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         """Get node executions for workflows owned by the current user."""
-        return NodeExecution.objects.filter(
-            workflow_execution__user=self.request.user
-        ).select_related("workflow_execution", "node")
+        return NodeExecution.objects.filter(workflow_execution__user=self.request.user).select_related(
+            "workflow_execution", "node"
+        )
 
     @action(detail=True, methods=["post"])
     def retry_node(self, request, pk=None):
@@ -229,9 +219,7 @@ class ExecutionMetricsViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         """Get metrics for workflows owned by the current user."""
-        return ExecutionMetrics.objects.filter(user=self.request.user).select_related(
-            "workflow", "user"
-        )
+        return ExecutionMetrics.objects.filter(user=self.request.user).select_related("workflow", "user")
 
     @action(detail=False, methods=["get"])
     def summary(self, request):
@@ -246,34 +234,17 @@ class ExecutionMetricsViewSet(viewsets.ReadOnlyModelViewSet):
 
         summary = {
             "total_days": recent_metrics.count(),
-            "total_executions": recent_metrics.aggregate(
-                total=models.Sum("total_executions")
-            )["total"]
-            or 0,
-            "total_successful": recent_metrics.aggregate(
-                total=models.Sum("successful_executions")
-            )["total"]
-            or 0,
-            "total_failed": recent_metrics.aggregate(
-                total=models.Sum("failed_executions")
-            )["total"]
-            or 0,
-            "average_daily_executions": recent_metrics.aggregate(
-                avg=models.Avg("total_executions")
-            )["avg"]
-            or 0,
-            "average_duration": recent_metrics.aggregate(
-                avg=models.Avg("average_duration")
-            )["avg"]
-            or 0,
+            "total_executions": recent_metrics.aggregate(total=models.Sum("total_executions"))["total"] or 0,
+            "total_successful": recent_metrics.aggregate(total=models.Sum("successful_executions"))["total"] or 0,
+            "total_failed": recent_metrics.aggregate(total=models.Sum("failed_executions"))["total"] or 0,
+            "average_daily_executions": recent_metrics.aggregate(avg=models.Avg("total_executions"))["avg"] or 0,
+            "average_duration": recent_metrics.aggregate(avg=models.Avg("average_duration"))["avg"] or 0,
         }
 
         # Calculate success rate
         total_executions = summary["total_executions"]
         if total_executions > 0:
-            summary["success_rate"] = (
-                summary["total_successful"] / total_executions
-            ) * 100
+            summary["success_rate"] = (summary["total_successful"] / total_executions) * 100
         else:
             summary["success_rate"] = 0
 

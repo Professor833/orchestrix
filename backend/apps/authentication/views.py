@@ -61,9 +61,7 @@ class UserLoginView(TokenObtainPairView):
     @method_decorator(ratelimit(key="ip", rate="10/m", method="POST", block=True))
     def post(self, request, *args, **kwargs):
         """Login user with email and password."""
-        serializer = UserLoginSerializer(
-            data=request.data, context={"request": request}
-        )
+        serializer = UserLoginSerializer(data=request.data, context={"request": request})
 
         if serializer.is_valid():
             user = serializer.validated_data["user"]
@@ -135,9 +133,7 @@ class ChangePasswordView(APIView):
     @method_decorator(ratelimit(key="user", rate="3/m", method="POST", block=True))
     def post(self, request):
         """Change user password."""
-        serializer = ChangePasswordSerializer(
-            data=request.data, context={"request": request}
-        )
+        serializer = ChangePasswordSerializer(data=request.data, context={"request": request})
 
         if serializer.is_valid():
             serializer.save()
@@ -162,18 +158,14 @@ class LogoutView(APIView):
             if refresh_token:
                 token = RefreshToken(refresh_token)
                 token.blacklist()
-                return Response(
-                    {"message": _("Logout successful")}, status=status.HTTP_200_OK
-                )
+                return Response({"message": _("Logout successful")}, status=status.HTTP_200_OK)
             else:
                 return Response(
                     {"error": _("Refresh token required")},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
         except Exception:
-            return Response(
-                {"error": _("Invalid token")}, status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"error": _("Invalid token")}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CurrentUserView(APIView):

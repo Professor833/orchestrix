@@ -38,9 +38,9 @@ class WorkflowTemplateViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """Filter templates based on user permissions."""
         user = self.request.user
-        return WorkflowTemplate.objects.filter(
-            models.Q(is_public=True) | models.Q(created_by=user)
-        ).select_related("created_by")
+        return WorkflowTemplate.objects.filter(models.Q(is_public=True) | models.Q(created_by=user)).select_related(
+            "created_by"
+        )
 
     def perform_create(self, serializer):
         """Set the created_by field to the current user."""
@@ -105,9 +105,7 @@ class WorkflowViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """Get workflows for the current user."""
-        return Workflow.objects.filter(user=self.request.user).prefetch_related(
-            "nodes", "schedule", "executions"
-        )
+        return Workflow.objects.filter(user=self.request.user).prefetch_related("nodes", "schedule", "executions")
 
     def get_serializer_class(self):
         """Return appropriate serializer based on action."""
@@ -123,9 +121,7 @@ class WorkflowViewSet(viewsets.ModelViewSet):
         workflow = self.get_object()
 
         if not workflow.is_active:
-            return Response(
-                {"error": "Workflow is not active"}, status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"error": "Workflow is not active"}, status=status.HTTP_400_BAD_REQUEST)
 
         # Import here to avoid circular imports
         from apps.workflows.tasks import execute_workflow
@@ -241,17 +237,13 @@ class WorkflowNodeViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """Get nodes for workflows owned by the current user."""
-        return WorkflowNode.objects.filter(
-            workflow__user=self.request.user
-        ).select_related("workflow", "parent_node")
+        return WorkflowNode.objects.filter(workflow__user=self.request.user).select_related("workflow", "parent_node")
 
     def perform_create(self, serializer):
         """Ensure user owns the workflow."""
         workflow = serializer.validated_data["workflow"]
         if workflow.user != self.request.user:
-            raise PermissionError(
-                "You don't have permission to add nodes to this workflow."
-            )
+            raise PermissionError("You don't have permission to add nodes to this workflow.")
         serializer.save()
 
 
@@ -263,15 +255,11 @@ class WorkflowScheduleViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """Get schedules for workflows owned by the current user."""
-        return WorkflowSchedule.objects.filter(
-            workflow__user=self.request.user
-        ).select_related("workflow")
+        return WorkflowSchedule.objects.filter(workflow__user=self.request.user).select_related("workflow")
 
     def perform_create(self, serializer):
         """Ensure user owns the workflow."""
         workflow = serializer.validated_data["workflow"]
         if workflow.user != self.request.user:
-            raise PermissionError(
-                "You don't have permission to create schedules for this workflow."
-            )
+            raise PermissionError("You don't have permission to create schedules for this workflow.")
         serializer.save()

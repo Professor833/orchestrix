@@ -183,9 +183,7 @@ class Command(BaseCommand):
                     {
                         "node_type": "parallel",
                         "name": "Multi-Platform Posting",
-                        "configuration": {
-                            "branches": ["twitter", "linkedin", "facebook"]
-                        },
+                        "configuration": {"branches": ["twitter", "linkedin", "facebook"]},
                         "position_x": 500,
                         "position_y": 100,
                     },
@@ -269,9 +267,7 @@ class Command(BaseCommand):
                     {
                         "node_type": "parallel",
                         "name": "Multi-Cloud Backup",
-                        "configuration": {
-                            "branches": ["aws_s3", "google_drive", "dropbox"]
-                        },
+                        "configuration": {"branches": ["aws_s3", "google_drive", "dropbox"]},
                         "position_x": 700,
                         "position_y": 100,
                     },
@@ -586,9 +582,7 @@ class Command(BaseCommand):
                     {
                         "node_type": "parallel",
                         "name": "Account Creation",
-                        "configuration": {
-                            "branches": ["create_email", "create_slack", "create_jira"]
-                        },
+                        "configuration": {"branches": ["create_email", "create_slack", "create_jira"]},
                         "position_x": 300,
                         "position_y": 100,
                     },
@@ -686,14 +680,8 @@ class Command(BaseCommand):
 
             if created:
                 created_count += 1
-                self.stdout.write(
-                    self.style.SUCCESS(f"Created template: {template.name}")
-                )
+                self.stdout.write(self.style.SUCCESS(f"Created template: {template.name}"))
             else:
-                self.stdout.write(
-                    self.style.WARNING(f"Template already exists: {template.name}")
-                )
+                self.stdout.write(self.style.WARNING(f"Template already exists: {template.name}"))
 
-        self.stdout.write(
-            self.style.SUCCESS(f"Successfully created {created_count} new templates")
-        )
+        self.stdout.write(self.style.SUCCESS(f"Successfully created {created_count} new templates"))

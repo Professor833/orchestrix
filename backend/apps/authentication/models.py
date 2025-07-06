@@ -50,8 +50,7 @@ class User(AbstractUser):
         _("active"),
         default=True,  # type: ignore
         help_text=_(  # type: ignore
-            "Designates whether this user should be treated as active. "
-            "Unselect this instead of deleting accounts."
+            "Designates whether this user should be treated as active. " "Unselect this instead of deleting accounts."
         ),
     )
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
@@ -84,9 +83,7 @@ class Account(models.Model):
     """Account model with 1-to-1 relationship to User model."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name="account", verbose_name=_("User")
-    )
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="account", verbose_name=_("User"))
     preferences = models.JSONField(
         _("user preferences"),
         default=dict,

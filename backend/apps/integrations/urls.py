@@ -9,12 +9,8 @@ from . import views
 
 # Create a router and register viewsets
 router = DefaultRouter()
-router.register(
-    r"categories", views.IntegrationCategoryViewSet, basename="integrationcategory"
-)
-router.register(
-    r"templates", views.IntegrationTemplateViewSet, basename="integrationtemplate"
-)
+router.register(r"categories", views.IntegrationCategoryViewSet, basename="integrationcategory")
+router.register(r"templates", views.IntegrationTemplateViewSet, basename="integrationtemplate")
 router.register(r"", views.IntegrationViewSet, basename="integration")
 router.register(r"logs", views.IntegrationLogViewSet, basename="integrationlog")
 router.register(r"webhooks", views.WebhookEndpointViewSet, basename="webhookendpoint")

@@ -20,9 +20,7 @@ class NodeExecutionSerializer(serializers.ModelSerializer):
     duration_seconds = serializers.SerializerMethodField()
 
     # Add fields that don't exist in the model
-    error_data = serializers.CharField(
-        source="error_message", required=False, allow_blank=True
-    )
+    error_data = serializers.CharField(source="error_message", required=False, allow_blank=True)
 
     class Meta:
         model = NodeExecution
@@ -64,9 +62,7 @@ class WorkflowExecutionSerializer(serializers.ModelSerializer):
     # Add extra fields that don't exist in the model
     trigger_data = serializers.JSONField(source="input_data", required=False)
     result_data = serializers.JSONField(source="output_data", required=False)
-    error_data = serializers.CharField(
-        source="error_message", required=False, allow_blank=True
-    )
+    error_data = serializers.CharField(source="error_message", required=False, allow_blank=True)
 
     class Meta:
         model = WorkflowExecution
@@ -115,9 +111,7 @@ class WorkflowExecutionSerializer(serializers.ModelSerializer):
         if total_nodes == 0:
             return 0
 
-        completed_nodes = obj.node_executions.filter(
-            status__in=["completed", "failed", "skipped"]
-        ).count()
+        completed_nodes = obj.node_executions.filter(status__in=["completed", "failed", "skipped"]).count()
 
         return round((completed_nodes / total_nodes) * 100, 2)
 

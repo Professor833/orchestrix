@@ -162,13 +162,9 @@ class IntegrationAdmin(admin.ModelAdmin):
         """Display expiration date with status."""
         if obj.expires_at:
             if obj.is_expired:
-                return format_html(
-                    '<span style="color: red;">🔴 {}</span>', obj.expires_at
-                )
+                return format_html('<span style="color: red;">🔴 {}</span>', obj.expires_at)
             else:
-                return format_html(
-                    '<span style="color: green;">🟢 {}</span>', obj.expires_at
-                )
+                return format_html('<span style="color: green;">🟢 {}</span>', obj.expires_at)
         return _("Never expires")
 
     expires_display.short_description = _("Expires")

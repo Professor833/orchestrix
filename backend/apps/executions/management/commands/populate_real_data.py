@@ -16,10 +16,7 @@ from apps.workflows.models import Workflow
 
 
 class Command(BaseCommand):
-    help = (
-        "Populates the database with additional real-world data for integrations "
-        "and executions."
-    )
+    help = "Populates the database with additional real-world data for integrations " "and executions."
 
     def handle(self, *args, **kwargs):
         fake = Faker()
@@ -30,11 +27,7 @@ class Command(BaseCommand):
             self.create_execution_data()
             self._create_webhook_endpoints(fake)
 
-        self.stdout.write(
-            self.style.SUCCESS(
-                "Successfully populated the database with additional data."
-            )
-        )
+        self.stdout.write(self.style.SUCCESS("Successfully populated the database with additional data."))
 
     def create_integration_data(self):
         self.stdout.write("Creating integration categories and templates...")
@@ -43,12 +36,8 @@ class Command(BaseCommand):
         communication_cat = self._get_or_create_category(
             "Communication", "Tools for team communication and notifications."
         )
-        _productivity_cat = self._get_or_create_category(
-            "Productivity", "Integrations to boost team productivity."
-        )
-        dev_tools_cat = self._get_or_create_category(
-            "Developer Tools", "Tools for software development and CI/CD."
-        )
+        _productivity_cat = self._get_or_create_category("Productivity", "Integrations to boost team productivity.")
+        dev_tools_cat = self._get_or_create_category("Developer Tools", "Tools for software development and CI/CD.")
 
         # Templates
         IntegrationTemplate.objects.get_or_create(
@@ -57,12 +46,8 @@ class Command(BaseCommand):
             defaults={
                 "service_type": "OAUTH",
                 "description": "Send notifications to Slack channels.",
-                "configuration_schema": {
-                    "channel": {"type": "string", "required": True}
-                },
-                "credential_schema": {
-                    "api_key": {"type": "password", "required": True}
-                },
+                "configuration_schema": {"channel": {"type": "string", "required": True}},
+                "credential_schema": {"api_key": {"type": "password", "required": True}},
             },
         )
         IntegrationTemplate.objects.get_or_create(
@@ -71,9 +56,7 @@ class Command(BaseCommand):
             defaults={
                 "service_type": "API_KEY",
                 "description": "Send SMS messages.",
-                "configuration_schema": {
-                    "from_number": {"type": "string", "required": True}
-                },
+                "configuration_schema": {"from_number": {"type": "string", "required": True}},
                 "credential_schema": {
                     "account_sid": {"type": "string", "required": True},
                     "auth_token": {"type": "password", "required": True},
@@ -86,12 +69,8 @@ class Command(BaseCommand):
             defaults={
                 "service_type": "OAUTH",
                 "description": "Interact with GitHub repositories.",
-                "configuration_schema": {
-                    "repository": {"type": "string", "required": True}
-                },
-                "credential_schema": {
-                    "access_token": {"type": "password", "required": True}
-                },
+                "configuration_schema": {"repository": {"type": "string", "required": True}},
+                "credential_schema": {"access_token": {"type": "password", "required": True}},
             },
         )
         self.stdout.write(self.style.SUCCESS("Integration data created."))
@@ -100,18 +79,12 @@ class Command(BaseCommand):
         self.stdout.write("Creating execution data for existing workflows...")
         workflows = list(Workflow.objects.all())
         if not workflows:
-            self.stdout.write(
-                self.style.WARNING(
-                    "No workflows found. Skipping execution data creation."
-                )
-            )
+            self.stdout.write(self.style.WARNING("No workflows found. Skipping execution data creation."))
             return
 
         for workflow in workflows:
             for i in range(random.randint(5, 15)):
-                start_time = timezone.now() - timedelta(
-                    days=random.randint(0, 30), hours=random.randint(0, 23)
-                )
+                start_time = timezone.now() - timedelta(days=random.randint(0, 30), hours=random.randint(0, 23))
                 end_time = start_time + timedelta(minutes=random.randint(1, 10))
                 status = random.choice(
                     [
@@ -154,24 +127,16 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS("Execution data created."))
 
     def _get_or_create_category(self, name, description):
-        category, created = IntegrationCategory.objects.get_or_create(
-            name=name, defaults={"description": description}
-        )
+        category, created = IntegrationCategory.objects.get_or_create(name=name, defaults={"description": description})
         if created:
-            self.stdout.write(
-                self.style.SUCCESS(f"Created integration category: {name}")
-            )
+            self.stdout.write(self.style.SUCCESS(f"Created integration category: {name}"))
         return category
 
     def _create_webhook_endpoints(self, fake):
         self.stdout.write("Creating webhook endpoints...")
         workflows = list(Workflow.objects.all())
         if not workflows:
-            self.stdout.write(
-                self.style.WARNING(
-                    "No workflows found. Cannot create webhook endpoints."
-                )
-            )
+            self.stdout.write(self.style.WARNING("No workflows found. Cannot create webhook endpoints."))
             return
 
         webhooks_data = [
@@ -205,6 +170,4 @@ class Command(BaseCommand):
             )
 
             if created:
-                self.stdout.write(
-                    self.style.SUCCESS(f"Created webhook endpoint: {webhook.name}")
-                )
+                self.stdout.write(self.style.SUCCESS(f"Created webhook endpoint: {webhook.name}"))

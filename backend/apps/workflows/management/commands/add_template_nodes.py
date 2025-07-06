@@ -25,8 +25,7 @@ class Command(BaseCommand):
                 temp_workflow = Workflow.objects.create(
                     name=f"Temp Workflow for {template.name}",
                     description=f"Temporary workflow for template {template.name}",
-                    user=template.created_by
-                    or Workflow.objects.first().user,  # Fallback to first user if no creator
+                    user=template.created_by or Workflow.objects.first().user,  # Fallback to first user if no creator
                     status="draft",
                     configuration=template.workflow_config,
                 )
@@ -47,12 +46,6 @@ class Command(BaseCommand):
                     WorkflowNode.objects.create(**node_data)
                     node_count += 1
 
-                self.stdout.write(
-                    self.style.SUCCESS(
-                        f"Created {node_count} nodes for template: {template.name}"
-                    )
-                )
+                self.stdout.write(self.style.SUCCESS(f"Created {node_count} nodes for template: {template.name}"))
 
-        self.stdout.write(
-            self.style.SUCCESS("Successfully created nodes for all templates")
-        )
+        self.stdout.write(self.style.SUCCESS("Successfully created nodes for all templates"))

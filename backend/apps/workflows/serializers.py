@@ -46,9 +46,7 @@ class WorkflowTemplateSerializer(serializers.ModelSerializer):
         from apps.workflows.models import Workflow, WorkflowNode
 
         # Find workflows created from this template
-        workflows = Workflow.objects.filter(
-            name__startswith=f"Temp Workflow for {obj.name}"
-        )
+        workflows = Workflow.objects.filter(name__startswith=f"Temp Workflow for {obj.name}")
 
         if not workflows.exists():
             return []
@@ -101,9 +99,7 @@ class WorkflowNodeSerializer(serializers.ModelSerializer):
         """Validate node type."""
         valid_types = [choice[0] for choice in WorkflowNode.NODE_TYPE_CHOICES]
         if value not in valid_types:
-            raise serializers.ValidationError(
-                f"Invalid node type. Must be one of: {valid_types}"
-            )
+            raise serializers.ValidationError(f"Invalid node type. Must be one of: {valid_types}")
         return value
 
 
@@ -129,9 +125,7 @@ class WorkflowScheduleSerializer(serializers.ModelSerializer):
     def validate_cron_expression(self, value):
         """Validate cron expression if schedule_type is 'cron'."""
         if self.initial_data.get("schedule_type") == "cron" and not value:
-            raise serializers.ValidationError(
-                "Cron expression is required when schedule_type is 'cron'."
-            )
+            raise serializers.ValidationError("Cron expression is required when schedule_type is 'cron'.")
         return value
 
 
@@ -189,27 +183,21 @@ class WorkflowSerializer(serializers.ModelSerializer):
         if self.instance:
             queryset = queryset.exclude(pk=self.instance.pk)
         if queryset.exists():
-            raise serializers.ValidationError(
-                "A workflow with this name already exists."
-            )
+            raise serializers.ValidationError("A workflow with this name already exists.")
         return value
 
     def validate_status(self, value):
         """Validate status changes."""
         valid_statuses = [choice[0] for choice in Workflow.STATUS_CHOICES]
         if value not in valid_statuses:
-            raise serializers.ValidationError(
-                f"Invalid status. Must be one of: {valid_statuses}"
-            )
+            raise serializers.ValidationError(f"Invalid status. Must be one of: {valid_statuses}")
         return value
 
     def validate_trigger_type(self, value):
         """Validate trigger type."""
         valid_triggers = [choice[0] for choice in Workflow.TRIGGER_CHOICES]
         if value not in valid_triggers:
-            raise serializers.ValidationError(
-                f"Invalid trigger type. Must be one of: {valid_triggers}"
-            )
+            raise serializers.ValidationError(f"Invalid trigger type. Must be one of: {valid_triggers}")
         return value
 
 

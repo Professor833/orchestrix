@@ -28,9 +28,7 @@ class WorkflowTemplate(models.Model):
     name = models.CharField(_("name"), max_length=200)
     description = models.TextField(_("description"), blank=True)
     category = models.CharField(_("category"), max_length=50, choices=CATEGORY_CHOICES)
-    created_by = models.ForeignKey(
-        User, on_delete=models.SET_NULL, null=True, blank=True
-    )
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     workflow_config = models.JSONField(_("workflow configuration"), default=dict)
     node_configs = models.JSONField(_("node configurations"), default=list)
     is_public = models.BooleanField(_("is public"), default=False)
@@ -71,13 +69,9 @@ class Workflow(models.Model):
     name = models.CharField(_("name"), max_length=200)
     description = models.TextField(_("description"), blank=True)
     configuration = models.JSONField(_("configuration"), default=dict)
-    status = models.CharField(
-        _("status"), max_length=20, choices=STATUS_CHOICES, default="draft"
-    )
+    status = models.CharField(_("status"), max_length=20, choices=STATUS_CHOICES, default="draft")
     is_active = models.BooleanField(_("is active"), default=True)
-    trigger_type = models.CharField(
-        _("trigger type"), max_length=20, choices=TRIGGER_CHOICES, default="manual"
-    )
+    trigger_type = models.CharField(_("trigger type"), max_length=20, choices=TRIGGER_CHOICES, default="manual")
     trigger_config = models.JSONField(_("trigger configuration"), default=dict)
     version = models.PositiveIntegerField(_("version"), default=1)
     category = models.CharField(_("category"), max_length=50, blank=True, null=True)
@@ -131,15 +125,9 @@ class WorkflowNode(models.Model):
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    workflow = models.ForeignKey(
-        Workflow, on_delete=models.CASCADE, related_name="nodes"
-    )
-    parent_node = models.ForeignKey(
-        "self", on_delete=models.CASCADE, null=True, blank=True, related_name="children"
-    )
-    node_type = models.CharField(
-        _("node type"), max_length=50, choices=NODE_TYPE_CHOICES
-    )
+    workflow = models.ForeignKey(Workflow, on_delete=models.CASCADE, related_name="nodes")
+    parent_node = models.ForeignKey("self", on_delete=models.CASCADE, null=True, blank=True, related_name="children")
+    node_type = models.CharField(_("node type"), max_length=50, choices=NODE_TYPE_CHOICES)
     name = models.CharField(_("name"), max_length=200)
     configuration = models.JSONField(_("configuration"), default=dict)
     input_schema = models.JSONField(_("input schema"), default=dict)
@@ -182,12 +170,8 @@ class WorkflowSchedule(models.Model):
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    workflow = models.OneToOneField(
-        Workflow, on_delete=models.CASCADE, related_name="schedule"
-    )
-    schedule_type = models.CharField(
-        _("schedule type"), max_length=20, choices=SCHEDULE_TYPE_CHOICES
-    )
+    workflow = models.OneToOneField(Workflow, on_delete=models.CASCADE, related_name="schedule")
+    schedule_type = models.CharField(_("schedule type"), max_length=20, choices=SCHEDULE_TYPE_CHOICES)
     cron_expression = models.CharField(_("cron expression"), max_length=100, blank=True)
     schedule_config = models.JSONField(_("schedule configuration"), default=dict)
     is_active = models.BooleanField(_("is active"), default=True)

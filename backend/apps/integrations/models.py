@@ -52,16 +52,10 @@ class Integration(models.Model):
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="integrations"
-    )
-    category = models.ForeignKey(
-        IntegrationCategory, on_delete=models.SET_NULL, null=True, blank=True
-    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="integrations")
+    category = models.ForeignKey(IntegrationCategory, on_delete=models.SET_NULL, null=True, blank=True)
     service_name = models.CharField(_("service name"), max_length=100)
-    service_type = models.CharField(
-        _("service type"), max_length=20, choices=SERVICE_TYPE_CHOICES
-    )
+    service_type = models.CharField(_("service type"), max_length=20, choices=SERVICE_TYPE_CHOICES)
     display_name = models.CharField(_("display name"), max_length=200, blank=True)
     description = models.TextField(_("description"), blank=True)
     credentials = models.JSONField(_("credentials"), default=dict)
@@ -132,9 +126,7 @@ class Integration(models.Model):
                     try:
                         decrypted_creds[key_name] = f.decrypt(value.encode()).decode()
                     except InvalidToken:
-                        decrypted_creds[key_name] = (
-                            value  # If decryption fails, return as-is
-                        )
+                        decrypted_creds[key_name] = value  # If decryption fails, return as-is
                 else:
                     decrypted_creds[key_name] = value
             else:
@@ -216,15 +208,9 @@ class IntegrationLog(models.Model):
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    integration = models.ForeignKey(
-        Integration, on_delete=models.CASCADE, related_name="logs"
-    )
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="integration_logs"
-    )
-    level = models.CharField(
-        _("level"), max_length=20, choices=LOG_LEVEL_CHOICES, default="info"
-    )
+    integration = models.ForeignKey(Integration, on_delete=models.CASCADE, related_name="logs")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="integration_logs")
+    level = models.CharField(_("level"), max_length=20, choices=LOG_LEVEL_CHOICES, default="info")
     action = models.CharField(_("action"), max_length=20, choices=ACTION_CHOICES)
     message = models.TextField(_("message"))
     data = models.JSONField(_("data"), default=dict)
@@ -250,9 +236,7 @@ class WebhookEndpoint(models.Model):
     """Webhook endpoints for receiving external triggers."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    integration = models.ForeignKey(
-        Integration, on_delete=models.CASCADE, related_name="webhook_endpoints"
-    )
+    integration = models.ForeignKey(Integration, on_delete=models.CASCADE, related_name="webhook_endpoints")
     name = models.CharField(_("name"), max_length=100)
     url_path = models.CharField(_("URL path"), max_length=200, unique=True)
     secret = models.CharField(_("secret"), max_length=100, blank=True)
@@ -291,12 +275,8 @@ class WebhookEvent(models.Model):
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    endpoint = models.ForeignKey(
-        WebhookEndpoint, on_delete=models.CASCADE, related_name="events"
-    )
-    status = models.CharField(
-        _("status"), max_length=20, choices=STATUS_CHOICES, default="received"
-    )
+    endpoint = models.ForeignKey(WebhookEndpoint, on_delete=models.CASCADE, related_name="events")
+    status = models.CharField(_("status"), max_length=20, choices=STATUS_CHOICES, default="received")
     headers = models.JSONField(_("headers"), default=dict)
     payload = models.JSONField(_("payload"), default=dict)
     response_data = models.JSONField(_("response data"), default=dict)

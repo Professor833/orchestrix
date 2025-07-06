@@ -164,9 +164,7 @@ class WorkflowAdmin(admin.ModelAdmin):
         """Display last execution with link."""
         last_execution = obj.last_execution
         if last_execution:
-            url = reverse(
-                "admin:executions_workflowexecution_change", args=[last_execution.id]
-            )
+            url = reverse("admin:executions_workflowexecution_change", args=[last_execution.id])
             return format_html('<a href="{}">{}</a>', url, last_execution.started_at)
         return _("No executions")
 

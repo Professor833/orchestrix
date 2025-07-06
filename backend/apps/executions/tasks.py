@@ -27,9 +27,7 @@ def cleanup_old_executions():
         status__in=["failed", "cancelled", "timeout"],
     )
 
-    old_successful_executions = WorkflowExecution.objects.filter(
-        started_at__lt=cutoff_date, status="completed"
-    )
+    old_successful_executions = WorkflowExecution.objects.filter(started_at__lt=cutoff_date, status="completed")
 
     failed_count = old_failed_executions.count()
     successful_count = old_successful_executions.count()
@@ -38,9 +36,7 @@ def cleanup_old_executions():
     old_failed_executions.delete()
     old_successful_executions.delete()
 
-    logger.info(
-        f"Cleaned up {failed_count} failed and {successful_count} successful old executions"
-    )
+    logger.info(f"Cleaned up {failed_count} failed and {successful_count} successful old executions")
 
     return {
         "deleted_failed": failed_count,
@@ -61,9 +57,7 @@ def generate_execution_metrics():
     workflow_user_groups = today_executions.values("workflow", "user").annotate(
         total=Count("id"),
         successful=Count("id", filter=models.Q(status="completed")),
-        failed=Count(
-            "id", filter=models.Q(status__in=["failed", "cancelled", "timeout"])
-        ),
+        failed=Count("id", filter=models.Q(status__in=["failed", "cancelled", "timeout"])),
         avg_duration=Avg("completed_at") - Avg("started_at"),
     )
 
@@ -78,10 +72,7 @@ def generate_execution_metrics():
         )
 
         total_duration = sum(
-            [
-                (execution.completed_at - execution.started_at).total_seconds()
-                for execution in workflow_executions
-            ]
+            [(execution.completed_at - execution.started_at).total_seconds() for execution in workflow_executions]
         )
 
         # Create or update metrics
@@ -93,11 +84,7 @@ def generate_execution_metrics():
                 "total_executions": group["total"],
                 "successful_executions": group["successful"],
                 "failed_executions": group["failed"],
-                "avg_duration": (
-                    timedelta(seconds=total_duration / group["total"])
-                    if group["total"] > 0
-                    else None
-                ),
+                "avg_duration": (timedelta(seconds=total_duration / group["total"]) if group["total"] > 0 else None),
                 "total_duration": timedelta(seconds=total_duration),
             },
         )
@@ -107,11 +94,7 @@ def generate_execution_metrics():
             metrics.total_executions = group["total"]
             metrics.successful_executions = group["successful"]
             metrics.failed_executions = group["failed"]
-            metrics.avg_duration = (
-                timedelta(seconds=total_duration / group["total"])
-                if group["total"] > 0
-                else None
-            )
+            metrics.avg_duration = timedelta(seconds=total_duration / group["total"]) if group["total"] > 0 else None
             metrics.total_duration = timedelta(seconds=total_duration)
             metrics.save()
 
@@ -128,9 +111,7 @@ def monitor_long_running_executions():
     # Find executions running for more than 1 hour
     timeout_threshold = timezone.now() - timedelta(hours=1)
 
-    long_running = WorkflowExecution.objects.filter(
-        status="running", started_at__lt=timeout_threshold
-    )
+    long_running = WorkflowExecution.objects.filter(status="running", started_at__lt=timeout_threshold)
 
     timed_out_count = 0
 
@@ -211,9 +192,7 @@ def send_execution_notifications(execution_id, notification_type="completed"):
             fail_silently=False,
         )
 
-        logger.info(
-            f"Sent {notification_type} notification to {user.email} for execution {execution_id}"
-        )
+        logger.info(f"Sent {notification_type} notification to {user.email} for execution {execution_id}")
 
         return {
             "status": "sent",
@@ -225,7 +204,5 @@ def send_execution_notifications(execution_id, notification_type="completed"):
         logger.error(f"Execution {execution_id} not found for notification")
         return {"status": "failed", "reason": "Execution not found"}
     except Exception as e:
-        logger.error(
-            f"Error sending notification for execution {execution_id}: {str(e)}"
-        )
+        logger.error(f"Error sending notification for execution {execution_id}: {str(e)}")
         return {"status": "failed", "reason": str(e)}

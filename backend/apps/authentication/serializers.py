@@ -22,9 +22,7 @@ def create_user_account(sender, instance, created, **kwargs):
 class UserRegistrationSerializer(serializers.ModelSerializer):
     """Serializer for user registration."""
 
-    password = serializers.CharField(
-        write_only=True, min_length=8, validators=[validate_password]
-    )
+    password = serializers.CharField(write_only=True, min_length=8, validators=[validate_password])
     password_confirm = serializers.CharField(write_only=True)
 
     class Meta:
@@ -38,9 +36,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         """Validate password confirmation."""
         if attrs["password"] != attrs["password_confirm"]:
-            raise serializers.ValidationError(
-                {"password_confirm": "Passwords do not match."}
-            )
+            raise serializers.ValidationError({"password_confirm": "Passwords do not match."})
         return attrs
 
     def create(self, validated_data):
@@ -62,9 +58,7 @@ class UserLoginSerializer(serializers.Serializer):
         password = attrs.get("password")
 
         if email and password:
-            user = authenticate(
-                request=self.context.get("request"), username=email, password=password
-            )
+            user = authenticate(request=self.context.get("request"), username=email, password=password)
 
             if not user:
                 raise serializers.ValidationError("Invalid email or password.")
@@ -147,9 +141,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
         # Update account fields if provided
         if account_data and hasattr(instance, "account"):
-            account_serializer = AccountSerializer(
-                instance.account, data=account_data, partial=True
-            )
+            account_serializer = AccountSerializer(instance.account, data=account_data, partial=True)
             if account_serializer.is_valid():
                 account_serializer.save()
 
@@ -166,9 +158,7 @@ class UserAccountUpdateSerializer(serializers.Serializer):
     # Account fields
     bio = serializers.CharField(max_length=500, required=False, allow_blank=True)
     avatar = serializers.URLField(required=False, allow_blank=True)
-    phone_number = serializers.CharField(
-        max_length=20, required=False, allow_blank=True
-    )
+    phone_number = serializers.CharField(max_length=20, required=False, allow_blank=True)
     timezone = serializers.CharField(max_length=50, required=False)
     language = serializers.CharField(max_length=10, required=False)
     preferences = serializers.JSONField(required=False)
@@ -202,9 +192,7 @@ class UserAccountUpdateSerializer(serializers.Serializer):
 
         # Update account fields
         if account_data and hasattr(instance, "account"):
-            account_serializer = AccountSerializer(
-                instance.account, data=account_data, partial=True
-            )
+            account_serializer = AccountSerializer(instance.account, data=account_data, partial=True)
             if account_serializer.is_valid():
                 account_serializer.save()
 
@@ -215,17 +203,13 @@ class ChangePasswordSerializer(serializers.Serializer):
     """Serializer for changing user password."""
 
     old_password = serializers.CharField(write_only=True)
-    new_password = serializers.CharField(
-        write_only=True, min_length=8, validators=[validate_password]
-    )
+    new_password = serializers.CharField(write_only=True, min_length=8, validators=[validate_password])
     new_password_confirm = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
         """Validate password change."""
         if attrs["new_password"] != attrs["new_password_confirm"]:
-            raise serializers.ValidationError(
-                {"new_password_confirm": "New passwords do not match."}
-            )
+            raise serializers.ValidationError({"new_password_confirm": "New passwords do not match."})
         return attrs
 
     def validate_old_password(self, value):

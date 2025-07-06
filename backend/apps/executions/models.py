@@ -33,13 +33,9 @@ class WorkflowExecution(models.Model):
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    workflow = models.ForeignKey(
-        "workflows.Workflow", on_delete=models.CASCADE, related_name="executions"
-    )
+    workflow = models.ForeignKey("workflows.Workflow", on_delete=models.CASCADE, related_name="executions")
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="executions")
-    status = models.CharField(
-        _("status"), max_length=20, choices=STATUS_CHOICES, default="pending"
-    )
+    status = models.CharField(_("status"), max_length=20, choices=STATUS_CHOICES, default="pending")
     input_data = models.JSONField(_("input data"), default=dict)
     output_data = models.JSONField(_("output data"), default=dict)
     started_at = models.DateTimeField(_("started at"), auto_now_add=True)
@@ -122,15 +118,9 @@ class NodeExecution(models.Model):
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    workflow_execution = models.ForeignKey(
-        WorkflowExecution, on_delete=models.CASCADE, related_name="node_executions"
-    )
-    node = models.ForeignKey(
-        "workflows.WorkflowNode", on_delete=models.CASCADE, related_name="executions"
-    )
-    status = models.CharField(
-        _("status"), max_length=20, choices=STATUS_CHOICES, default="pending"
-    )
+    workflow_execution = models.ForeignKey(WorkflowExecution, on_delete=models.CASCADE, related_name="node_executions")
+    node = models.ForeignKey("workflows.WorkflowNode", on_delete=models.CASCADE, related_name="executions")
+    status = models.CharField(_("status"), max_length=20, choices=STATUS_CHOICES, default="pending")
     input_data = models.JSONField(_("input data"), default=dict)
     output_data = models.JSONField(_("output data"), default=dict)
     started_at = models.DateTimeField(_("started at"), auto_now_add=True)
@@ -200,17 +190,11 @@ class ExecutionMetrics(models.Model):
     """Stores aggregated metrics for executions."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    workflow = models.ForeignKey(
-        "workflows.Workflow", on_delete=models.CASCADE, related_name="metrics"
-    )
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="execution_metrics"
-    )
+    workflow = models.ForeignKey("workflows.Workflow", on_delete=models.CASCADE, related_name="metrics")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="execution_metrics")
     date = models.DateField(_("date"), auto_now_add=True)
     total_executions = models.PositiveIntegerField(_("total executions"), default=0)
-    successful_executions = models.PositiveIntegerField(
-        _("successful executions"), default=0
-    )
+    successful_executions = models.PositiveIntegerField(_("successful executions"), default=0)
     failed_executions = models.PositiveIntegerField(_("failed executions"), default=0)
     avg_duration = models.DurationField(_("average duration"), null=True, blank=True)
     total_duration = models.DurationField(_("total duration"), null=True, blank=True)

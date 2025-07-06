@@ -117,9 +117,7 @@ class IntegrationListSerializer(serializers.ModelSerializer):
 class IntegrationLogSerializer(serializers.ModelSerializer):
     """Serializer for IntegrationLog model."""
 
-    integration_name = serializers.CharField(
-        source="integration.display_name", read_only=True
-    )
+    integration_name = serializers.CharField(source="integration.display_name", read_only=True)
 
     class Meta:
         model = IntegrationLog
@@ -142,9 +140,7 @@ class IntegrationLogSerializer(serializers.ModelSerializer):
 class WebhookEndpointSerializer(serializers.ModelSerializer):
     """Serializer for WebhookEndpoint model."""
 
-    integration_name = serializers.CharField(
-        source="integration.display_name", read_only=True
-    )
+    integration_name = serializers.CharField(source="integration.display_name", read_only=True)
     url = serializers.SerializerMethodField()
 
     class Meta:
@@ -214,9 +210,7 @@ class IntegrationTestSerializer(serializers.Serializer):
 class IntegrationSyncSerializer(serializers.Serializer):
     """Serializer for syncing integration data."""
 
-    sync_type = serializers.ChoiceField(
-        choices=["full", "incremental"], default="incremental"
-    )
+    sync_type = serializers.ChoiceField(choices=["full", "incremental"], default="incremental")
 
     def validate(self, data):
         """Trigger integration sync."""

@@ -57,8 +57,6 @@ sys.modules["pkg_resources"] = type(
     (),
     {
         "DistributionNotFound": type("DistributionNotFound", (Exception,), {}),
-        "get_distribution": lambda name: type(
-            "MockDist", (), {"version": get_version(name)}
-        )(),
+        "get_distribution": lambda name: type("MockDist", (), {"version": get_version(name)})(),
     },
 )

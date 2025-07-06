@@ -221,9 +221,7 @@ class NodeExecutionAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         """Optimize queryset with select_related."""
-        return (
-            super().get_queryset(request).select_related("workflow_execution", "node")
-        )
+        return super().get_queryset(request).select_related("workflow_execution", "node")
 
     def duration_display(self, obj):
         """Display node execution duration."""
