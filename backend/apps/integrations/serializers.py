@@ -5,14 +5,7 @@ Serializers for integration models.
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from .models import (
-    Integration,
-    IntegrationCategory,
-    IntegrationLog,
-    IntegrationTemplate,
-    WebhookEndpoint,
-    WebhookEvent,
-)
+from .models import Integration, IntegrationCategory, IntegrationLog, IntegrationTemplate, WebhookEndpoint, WebhookEvent
 
 User = get_user_model()
 
@@ -220,7 +213,7 @@ class IntegrationSyncSerializer(serializers.Serializer):
         # For now, we'll just return success
         return {
             "success": True,
-            "message": f"Integration sync started for {integration.name}",
+            "message": f"Integration sync started for {integration.display_name}",
             "sync_type": data["sync_type"],
-            "started_at": integration.last_sync,
+            "started_at": integration.last_used,
         }

@@ -169,6 +169,7 @@ export interface Integration {
     | 'other'
   display_name: string
   description: string
+  category_name: string
   configuration: Record<string, any>
   is_active: boolean
   is_verified: boolean

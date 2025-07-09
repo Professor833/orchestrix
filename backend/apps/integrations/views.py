@@ -9,14 +9,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from .models import (
-    Integration,
-    IntegrationCategory,
-    IntegrationLog,
-    IntegrationTemplate,
-    WebhookEndpoint,
-    WebhookEvent,
-)
+from .models import Integration, IntegrationCategory, IntegrationLog, IntegrationTemplate, WebhookEndpoint, WebhookEvent
 from .serializers import (
     IntegrationCategorySerializer,
     IntegrationListSerializer,
@@ -40,6 +33,7 @@ class IntegrationCategoryViewSet(viewsets.ReadOnlyModelViewSet):
     search_fields = ["name", "description"]
     ordering_fields = ["name", "created_at"]
     ordering = ["name"]
+    pagination_class = None
 
 
 class IntegrationTemplateViewSet(viewsets.ReadOnlyModelViewSet):
@@ -56,10 +50,48 @@ class IntegrationTemplateViewSet(viewsets.ReadOnlyModelViewSet):
     search_fields = ["name", "service_name", "description"]
     ordering_fields = ["name", "service_name", "created_at"]
     ordering = ["name"]
+    pagination_class = None
 
     def get_queryset(self):
         """Get active templates."""
         return IntegrationTemplate.objects.filter(is_active=True).select_related("category")
+
+    @action(detail=True, methods=["post"])
+    def create_integration(self, request, pk=None):
+        """Create integration from template."""
+        template = self.get_object()
+
+        # Get the data from request
+        display_name = request.data.get("display_name", template.name)
+        configuration = request.data.get("configuration", {})
+
+        # Extract credentials from configuration
+        credentials = configuration.pop("credentials", {})
+
+        # Create the integration
+        integration = Integration.objects.create(
+            user=request.user,
+            category=template.category,
+            service_name=template.service_name,
+            service_type=template.service_type,
+            display_name=display_name,
+            description=request.data.get("description", template.description),
+            credentials=credentials,
+            configuration=configuration,
+        )
+
+        # Log the creation
+        IntegrationLog.objects.create(
+            integration=integration,
+            user=request.user,
+            level="info",
+            action="created",
+            message=f"Integration created from template: {template.name}",
+            data={"template_id": str(template.id)},
+        )
+
+        serializer = IntegrationSerializer(integration)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class IntegrationViewSet(viewsets.ModelViewSet):
