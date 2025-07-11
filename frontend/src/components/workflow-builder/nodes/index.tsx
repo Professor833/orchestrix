@@ -1,10 +1,10 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { NodeTypes, NodeProps } from 'reactflow'
 import { BaseNode } from './BaseNode'
 import { WorkflowNodeData } from '../types'
 
 // Create wrapper components that pass handlers to BaseNode
-const TriggerNode = (props: NodeProps<WorkflowNodeData>) => {
+const TriggerNode = memo((props: NodeProps<WorkflowNodeData>) => {
   return (
     <BaseNode
       {...props}
@@ -13,9 +13,10 @@ const TriggerNode = (props: NodeProps<WorkflowNodeData>) => {
       onUpdate={props.data?.onUpdate}
     />
   )
-}
+})
+TriggerNode.displayName = 'TriggerNode'
 
-const ActionNode = (props: NodeProps<WorkflowNodeData>) => {
+const ActionNode = memo((props: NodeProps<WorkflowNodeData>) => {
   return (
     <BaseNode
       {...props}
@@ -24,9 +25,10 @@ const ActionNode = (props: NodeProps<WorkflowNodeData>) => {
       onUpdate={props.data?.onUpdate}
     />
   )
-}
+})
+ActionNode.displayName = 'ActionNode'
 
-const ConditionNode = (props: NodeProps<WorkflowNodeData>) => {
+const ConditionNode = memo((props: NodeProps<WorkflowNodeData>) => {
   return (
     <BaseNode
       {...props}
@@ -35,9 +37,10 @@ const ConditionNode = (props: NodeProps<WorkflowNodeData>) => {
       onUpdate={props.data?.onUpdate}
     />
   )
-}
+})
+ConditionNode.displayName = 'ConditionNode'
 
-const OutputNode = (props: NodeProps<WorkflowNodeData>) => {
+const OutputNode = memo((props: NodeProps<WorkflowNodeData>) => {
   return (
     <BaseNode
       {...props}
@@ -46,8 +49,10 @@ const OutputNode = (props: NodeProps<WorkflowNodeData>) => {
       onUpdate={props.data?.onUpdate}
     />
   )
-}
+})
+OutputNode.displayName = 'OutputNode'
 
+// Create stable nodeTypes object
 export const nodeTypes: NodeTypes = {
   trigger: TriggerNode,
   action: ActionNode,

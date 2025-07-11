@@ -58,6 +58,7 @@ build/
 *~
 .qodo/
 qodo
+.cursor/
 
 # OS
 .DS_Store

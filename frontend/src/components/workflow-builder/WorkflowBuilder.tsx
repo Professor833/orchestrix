@@ -147,8 +147,12 @@ function WorkflowBuilderInner({
         edges: newEdges as WorkflowEdge[]
       }
       setState(newState)
+
+      // Also update React Flow nodes and edges directly
+      setNodes(newNodes)
+      setEdges(newEdges)
     },
-    [nodes, edges, state, setState]
+    [nodes, edges, state, setState, setNodes, setEdges]
   )
 
   // Handle auto layout
@@ -167,7 +171,7 @@ function WorkflowBuilderInner({
     setState(newState)
   }, [nodes, edges, state, setState])
 
-  // Initialize nodes with handlers when workflow data is first loaded
+  // Initialize nodes with handlers only once when component mounts
   useEffect(() => {
     if (state.nodes.length > 0 && nodes.length === 0) {
       const nodesWithHandlers = state.nodes.map(node => ({

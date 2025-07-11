@@ -124,7 +124,7 @@ export const BaseNode = memo(({ id, data, onConfigure, onDelete, onUpdate }: Bas
 
           {/* Action buttons - show on hover */}
           {isHovered && (
-            <div className="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="flex space-x-1 transition-opacity">
               <Button
                 size="sm"
                 variant="ghost"
