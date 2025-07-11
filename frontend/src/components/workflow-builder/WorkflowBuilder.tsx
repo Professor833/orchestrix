@@ -137,7 +137,10 @@ function WorkflowBuilderInner({
   // Handle node deletion
   const onNodeDelete = useCallback(
     (nodeId: string) => {
+      console.log('Deleting node with ID:', nodeId)
+      console.log('Current nodes:', nodes.map(n => ({ id: n.id, dataId: n.data?.id })))
       const newNodes = nodes.filter((node) => node.id !== nodeId)
+      console.log('Nodes after deletion:', newNodes.map(n => ({ id: n.id, dataId: n.data?.id })))
       const newEdges = edges.filter(
         (edge) => edge.source !== nodeId && edge.target !== nodeId
       )
@@ -203,12 +206,13 @@ function WorkflowBuilderInner({
       })
 
       const template = getNodeTemplate(nodeType)
+      const nodeId = getId()
       const newNode: WorkflowNode = {
-        id: getId(),
+        id: nodeId,
         type: nodeType,
         position,
         data: {
-          id: getId(),
+          id: nodeId,
           type: nodeType,
           name: `${template.name} ${state.nodes.length + 1}`,
           description: template.description,
