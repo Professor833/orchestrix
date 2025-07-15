@@ -1,7 +1,11 @@
 {
     "pythonVersion": "3.11",
     "pythonPlatform": "All",
-    "include": ["apps", "orchestrix", "manage.py"],
+    "include": [
+        "backend/apps",
+        "backend/orchestrix",
+        "backend/manage.py"
+    ],
     "exclude": [
         "**/__pycache__",
         "**/node_modules",
@@ -13,16 +17,18 @@
         "**/design",
         "**/.git",
         "**/static",
-        "**/media"
+        "**/media",
+        "frontend/**",
+        "temp/**"
     ],
     "extraPaths": [
-        ".",
-        "./apps",
-        "./orchestrix",
-        "./apps/authentication",
-        "./apps/workflows",
-        "./apps/executions",
-        "./apps/integrations"
+        "backend",
+        "backend/apps",
+        "backend/orchestrix",
+        "backend/apps/authentication",
+        "backend/apps/workflows",
+        "backend/apps/executions",
+        "backend/apps/integrations"
     ],
     "typeCheckingMode": "off",
     "useLibraryCodeForTypes": false,
@@ -95,6 +101,6 @@
     "reportUnusedCoroutine": "none",
     "reportUnnecessaryTypeIgnoreComment": "none",
     "reportMatchNotExhaustive": "none",
-    "venvPath": ".",
+    "venvPath": "backend",
     "venv": "venv"
 }
