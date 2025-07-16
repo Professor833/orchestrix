@@ -3,6 +3,7 @@ Views for workflow management.
 """
 
 from django.db import models, transaction
+from django.db.utils import IntegrityError
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
@@ -50,14 +51,46 @@ class WorkflowTemplateViewSet(viewsets.ModelViewSet):
     def use_template(self, request, pk=None):
         """Create a workflow from a template."""
         template = self.get_object()
+        force_create = request.data.get("force", False)
+
+        # Check if user has already created a workflow from this template
+        existing_workflows = Workflow.objects.filter(user=request.user, template_id=template.id)
+
+        if existing_workflows.exists() and not force_create:
+            # Return confirmation dialog data
+            return Response(
+                {
+                    "requires_confirmation": True,
+                    "message": "This workflow already exists",
+                    "details": f"You have already created {existing_workflows.count()} workflow(s) from this template. Are you sure you want to create a copy?",  # noqa: E501
+                    "existing_workflows": [
+                        {
+                            "id": workflow.id,
+                            "name": workflow.name,
+                            "created_at": workflow.created_at,
+                        }
+                        for workflow in existing_workflows[:3]  # Show first 3
+                    ],
+                    "total_existing": existing_workflows.count(),
+                },
+                status=status.HTTP_200_OK,
+            )
 
         # Get custom name from request or use default
-        workflow_name = request.data.get("name", f"{template.name} (from template)")
+        workflow_name = request.data.get("name", f"New Workflow from {template.name}")
         workflow_description = request.data.get("description", template.description)
 
-        # Increment usage count
-        template.usage_count += 1
-        template.save(update_fields=["usage_count"])
+        # Check if workflow name already exists for this user
+        original_name = workflow_name
+        name_modified = False
+        if Workflow.objects.filter(user=request.user, name=workflow_name).exists():
+            # Generate unique name by appending a counter
+            counter = 1
+            base_name = workflow_name
+            while Workflow.objects.filter(user=request.user, name=workflow_name).exists():
+                workflow_name = f"{base_name} ({counter})"
+                counter += 1
+            name_modified = True
 
         # Create workflow from template
         workflow_data = {
@@ -65,28 +98,65 @@ class WorkflowTemplateViewSet(viewsets.ModelViewSet):
             "description": workflow_description,
             "configuration": template.workflow_config,
             "user": request.user,
+            "template_id": template.id,
         }
 
-        with transaction.atomic():
-            workflow = Workflow.objects.create(**workflow_data)
+        try:
+            with transaction.atomic():
+                workflow = Workflow.objects.create(**workflow_data)
 
-            # Create nodes from template
-            for node_config in template.node_configs:
-                # Create a copy of the node config to avoid modifying the template
-                node_data = {
-                    "workflow": workflow,
-                    "node_type": node_config.get("node_type"),
-                    "name": node_config.get("name"),
-                    "configuration": node_config.get("configuration", {}),
-                    "input_schema": node_config.get("input_schema", {}),
-                    "output_schema": node_config.get("output_schema", {}),
-                    "position_x": node_config.get("position_x", 0),
-                    "position_y": node_config.get("position_y", 0),
+                # Create nodes from template
+                for node_config in template.node_configs:
+                    # Create a copy of the node config to avoid modifying the template
+                    node_data = {
+                        "workflow": workflow,
+                        "node_type": node_config.get("node_type"),
+                        "name": node_config.get("name"),
+                        "configuration": node_config.get("configuration", {}),
+                        "input_schema": node_config.get("input_schema", {}),
+                        "output_schema": node_config.get("output_schema", {}),
+                        "position_x": node_config.get("position_x", 0),
+                        "position_y": node_config.get("position_y", 0),
+                    }
+                    WorkflowNode.objects.create(**node_data)
+
+                # Increment usage count only after successful creation
+                template.usage_count += 1
+                template.save(update_fields=["usage_count"])
+
+            serializer = WorkflowSerializer(workflow, context={"request": request})
+            response_data = serializer.data
+
+            # Add warning message if name was modified
+            if name_modified:
+                response_data["warning"] = {
+                    "message": f"A workflow named '{original_name}' already exists. Created as '{workflow_name}' instead.",  # noqa: E501
+                    "code": "name_modified",
+                    "original_name": original_name,
+                    "final_name": workflow_name,
                 }
-                WorkflowNode.objects.create(**node_data)
 
-        serializer = WorkflowSerializer(workflow, context={"request": request})
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(response_data, status=status.HTTP_201_CREATED)
+
+        except IntegrityError as e:
+            # Handle any remaining integrity errors
+            if "workflows_user_id_name_" in str(e):
+                return Response(
+                    {
+                        "error": "A workflow with this name already exists. Please choose a different name.",
+                        "field": "name",
+                        "code": "duplicate_name",
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            else:
+                return Response(
+                    {
+                        "error": "An error occurred while creating the workflow. Please try again.",
+                        "code": "creation_error",
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
 
 class WorkflowViewSet(viewsets.ModelViewSet):

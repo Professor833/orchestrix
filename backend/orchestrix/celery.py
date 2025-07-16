@@ -51,6 +51,7 @@ app.conf.update(
     task_soft_time_limit=25 * 60,  # 25 minutes
     worker_max_tasks_per_child=1000,
     worker_max_memory_per_child=200000,  # 200MB
+    broker_connection_retry_on_startup=True,
 )
 
 

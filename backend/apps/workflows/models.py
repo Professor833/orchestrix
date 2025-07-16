@@ -76,6 +76,9 @@ class Workflow(models.Model):
     version = models.PositiveIntegerField(_("version"), default=1)
     category = models.CharField(_("category"), max_length=50, blank=True, null=True)
     tags = models.JSONField(_("tags"), default=list)
+    template_id = models.UUIDField(
+        _("template ID"), null=True, blank=True, help_text="ID of the template this workflow was created from"
+    )
     last_run_at = models.DateTimeField(_("last run at"), null=True, blank=True)
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("updated at"), auto_now=True)
